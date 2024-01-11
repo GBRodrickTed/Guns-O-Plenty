@@ -31,6 +31,8 @@ namespace GunsOPlenty.Stuff
         public static GameObject rocket = Addressables.LoadAssetAsync<GameObject>("Assets/Prefabs/Attacks and Projectiles/Rocket.prefab").WaitForCompletion();
         public static GameObject cannonball = Addressables.LoadAssetAsync<GameObject>("Assets/Prefabs/Attacks and Projectiles/Cannonball.prefab").WaitForCompletion();
         public static GameObject progHomingExpl = Addressables.LoadAssetAsync<GameObject>("Assets/Prefabs/Attacks and Projectiles/Projectile Homing Explosive.prefab").WaitForCompletion();
+        public static GameObject gutterbeam = Addressables.LoadAssetAsync<GameObject>("Assets/Prefabs/Attacks and Projectiles/Hitscan Beams/Gutterman Beam.prefab").WaitForCompletion();
+        
     }
     public static class ShaderBox
     {

@@ -9,8 +9,6 @@ using static UnityEngine.ResourceManagement.Util.BinaryStorageBuffer.Writer;
 
 namespace GunsOPlenty.Stuff
 {
-    // some stuff is from Crashlib
-    //https://github.com/KidoHyde/CrashLibs/blob/main/CrashUtils/Utils.cs
     public static class GOPUtils
     {
         public static string GameDirectory()

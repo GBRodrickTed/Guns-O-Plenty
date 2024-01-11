@@ -10,9 +10,11 @@ using GunsOPlenty.Weapons;
 using UnityEngine.AddressableAssets;
 using UnityEngine.AddressableAssets.ResourceLocators;
 
+// To anyone looking at this code, please know that I started this when I was a complete unity noob so some of this code is a little wonky.
+// A lot of code is heavily inspired by (if not completely ripped off from) Crashlib
+//https://github.com/KidoHyde/CrashLibs/blob/main
 namespace GunsOPlenty
 {
-    // To anyone looking at this code, please know that I started this when I was a complete unity noob so some of this code could be done a lot more efficiently.
     [BepInPlugin(PluginInfo.GUID, PluginInfo.Name, PluginInfo.Version)]
     public class Plugin : BaseUnityPlugin
     {

@@ -28,6 +28,7 @@ namespace GunsOPlenty.Weapons
             this.gunBarrelAud = gunBarrel.GetComponent<AudioSource>();
             this.anim = this.GetComponent<Animator>();
             this.weaponIcon = this.gameObject.AddComponent<WeaponIcon>();
+            this.targeter = MonoSingleton<CameraFrustumTargeter>.instance;
             base.gameObject.TryGetComponent<WeaponIdentifier>(out this.wid);
 
             if (weaponIcon.weaponDescriptor == null)
@@ -37,6 +38,7 @@ namespace GunsOPlenty.Weapons
                 this.weaponIcon.weaponDescriptor.glowIcon = this.weaponIcon.weaponDescriptor.icon;
             }
             gunBarrelAud.clip = null; // for duel power. Why this happen in this gun specifically, idk.
+            
         }
 
         private void OnEnable()
@@ -84,11 +86,18 @@ namespace GunsOPlenty.Weapons
             if (fireDelay < fireTime || NoWeaponCooldown.NoCooldown)
             {
                 anim.SetTrigger("Shoot");
-                gunBarrelAud.clip = TrashCan.bundle.LoadAsset<AudioClip>("FunShoot"); //scratch dot com type sfx
+                gunBarrelAud.clip = TrashCan.bundle.LoadAsset<AudioClip>("FunShoot"); //scratch dot com type beat
                 gunBarrelAud.pitch = 0.75f + fireMult * 0.02f;
                 //gunBarrelAud.volume = 1f;
                 gunBarrelAud.Play();
-                Instantiate<GameObject>(this.beam, this.gunBarrel.transform.position, this.cc.transform.rotation * GOPUtils.RandRot(1));//this.cc.transform.rotation
+                GameObject funbeam = Instantiate<GameObject>(this.beam, this.gunBarrel.transform.position, this.cc.transform.rotation * GOPUtils.RandRot(fireMult / 100f));
+                RevolverBeam gutRevBeam = funbeam.GetComponent<RevolverBeam>();
+                funbeam.GetComponent<RevolverBeam>().damage = 0.5f;
+                if (this.targeter.CurrentTarget && this.targeter.IsAutoAimed)
+                {
+                    funbeam.transform.LookAt(this.targeter.CurrentTarget.bounds.center);
+                    funbeam.transform.rotation *= GOPUtils.RandRot(fireMult/100f);
+                }
                 fireTime = 0;
                 fireMult += 0.5f;
             }
@@ -99,13 +108,17 @@ namespace GunsOPlenty.Weapons
             if (fireDelay * 2.75f < fireTime || NoWeaponCooldown.NoCooldown)
             {
                 anim.SetTrigger("Shoot");
-                gunBarrelAud.clip = TrashCan.bundle.LoadAsset<AudioClip>("FunBall"); //scratch dot com type sfx
+                gunBarrelAud.clip = TrashCan.bundle.LoadAsset<AudioClip>("FunBall"); //scratch dot com type beat
                 gunBarrelAud.pitch = 0.5f + fireMult * 0.02f;
                 //gunBarrelAud.volume = 15f;
                 gunBarrelAud.Play();
-                GameObject ball = Instantiate<GameObject>(this.cannonball, this.cam.transform.position + this.cam.transform.forward * 1f, Quaternion.identity);
+                GameObject ball = Instantiate<GameObject>(this.cannonball, this.gunBarrel.transform.position + this.gunBarrel.transform.forward * 1f, this.cc.transform.rotation);
                 Rigidbody ballRig = ball.GetComponent<Rigidbody>();
-                ballRig.AddForce(this.cam.transform.forward * (2f * fireMult + 50f), ForceMode.VelocityChange);
+                if (this.targeter.CurrentTarget && this.targeter.IsAutoAimed)
+                {
+                    ballRig.transform.LookAt(this.targeter.CurrentTarget.bounds.center);
+                }
+                ballRig.AddForce(ballRig.transform.forward * (2f * fireMult + 50f), ForceMode.VelocityChange);
                 fireTime = 0;
                 fireMult -= 1.25f + fireMult * 0.05f;
 
@@ -130,11 +143,13 @@ namespace GunsOPlenty.Weapons
         private GameObject beam = PrefabBox.beam;
         private GameObject coin = PrefabBox.coin;
         private GameObject cannonball = PrefabBox.cannonball;
+        private GameObject gutterbeam = PrefabBox.gutterbeam;
         private GameObject camObj;
         private Camera cam;
         private CameraController cc;
         private GunControl gc;
         private Animator anim;
+        private CameraFrustumTargeter targeter;
         private AudioSource gunBarrelAud;
         private WeaponIcon weaponIcon;
         private WeaponIdentifier wid;

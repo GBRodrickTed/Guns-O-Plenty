@@ -11,8 +11,16 @@ namespace GunsOPlenty.Weapons
     {
         private void Start()
         {
-            MonoSingleton<StyleHUD>.instance.idNameDict.Add("ultrakill.moneyshot", "<color=#ffb700>MONEY SHOT</color>"); // I really need to organize this mod
-            MonoSingleton<StyleHUD>.instance.freshnessDecayMultiplierDict.Add("ultrakill.moneyshot", 0f);
+            // it literally only works here, I'll polish this later
+            if (!MonoSingleton<StyleHUD>.instance.idNameDict.ContainsKey("ultrakill.moneyshot"))
+            {
+                MonoSingleton<StyleHUD>.instance.idNameDict.Add("ultrakill.moneyshot", "<color=#ffb700>MONEY SHOT</color>");
+            }
+
+            if (!MonoSingleton<StyleHUD>.instance.freshnessDecayMultiplierDict.ContainsKey("ultrakill.moneyshot"))
+            {
+                MonoSingleton<StyleHUD>.instance.freshnessDecayMultiplierDict.Add("ultrakill.moneyshot", 0f);
+            }
 
             this.cam = MonoSingleton<CameraController>.Instance.GetComponent<Camera>();
             this.gc = MonoSingleton<GunControl>.Instance.GetComponent<GunControl>();
@@ -26,7 +34,7 @@ namespace GunsOPlenty.Weapons
             this.gunTipAud = gunTip.GetComponent<AudioSource>();
             this.pumpAud = GOPUtils.DescendantByName(this.gameObject, "Shotgun_Pump").GetComponent<AudioSource>();
             this.triggerAud = GOPUtils.DescendantByName(this.gameObject, "Shotgun_Trigger").GetComponent<AudioSource>();
-
+            this.targeter = MonoSingleton<CameraFrustumTargeter>.instance;
             this.anim = GOPUtils.DescendantByName(this.gameObject, "golden_shotgun").GetComponent<Animator>();
 
             base.gameObject.TryGetComponent<WeaponIdentifier>(out this.wid);
@@ -111,7 +119,12 @@ namespace GunsOPlenty.Weapons
                     }
                     for (int i = 0; i < shots; i++)
                     {
-                        Instantiate<GameObject>(coinShot, this.cam.transform.position + this.cam.transform.forward * 0.1f - this.cam.transform.up * 0.1f, (this.cam.transform.rotation) * GOPUtils.RandRot(spread));
+                        GameObject coinBeam = Instantiate<GameObject>(coinShot, this.cam.transform.position + this.cam.transform.forward * 0.1f - this.cam.transform.up * 0.1f, (this.cam.transform.rotation) * GOPUtils.RandRot(spread));
+                        if (this.targeter.CurrentTarget && this.targeter.IsAutoAimed)
+                        {
+                            coinBeam.transform.LookAt(this.targeter.CurrentTarget.bounds.center);
+                            coinBeam.transform.rotation *= GOPUtils.RandRot(spread);
+                        }
                     }
                     pumps = 0;
                     this.coinShotComp.power = 1;
@@ -203,6 +216,7 @@ namespace GunsOPlenty.Weapons
         private AudioSource gunTipAud;
         private AudioSource pumpAud;
         private AudioSource triggerAud;
+        private CameraFrustumTargeter targeter;
         private WeaponIcon weaponIcon;
         private WeaponIdentifier wid;
     }

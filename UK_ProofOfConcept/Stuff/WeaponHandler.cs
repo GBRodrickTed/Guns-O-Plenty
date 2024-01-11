@@ -8,8 +8,6 @@ using UnityEngine;
 
 namespace GunsOPlenty.Stuff
 {
-    // https://github.com/KidoHyde/CrashLibs/blob/main/CrashUtils/WeaponManager/GunAdditives.cs
-    // TODO: Rip off CrashLibs less
     public class WeaponHandler
     {
         internal static List<GOPWeapon> WeaponList = new List<GOPWeapon>();
@@ -171,13 +169,6 @@ namespace GunsOPlenty.Stuff
                         __instance.AddPoints(5, "", eid, sourceWeapon);
                     }
                 }
-            }
-
-            [HarmonyPatch(typeof(StyleHUD), nameof(StyleHUD.Start))]
-            [HarmonyPostfix]
-            public static void AddStyle(StyleHUD __instance)
-            {
-                
             }
         }
     }
