@@ -1,26 +1,76 @@
-﻿using System;
-using System.Collections;
+﻿using GunsOPlenty.Utils;
+using GunsOPlenty.Weapons;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
+using System.Xml.Linq;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.AddressableAssets.ResourceLocators;
-using UnityEngine.Diagnostics;
 using UnityEngine.ResourceManagement.AsyncOperations;
-using UnityEngine.ResourceManagement.ResourceLocations;
-using static UnityEngine.ResourceManagement.Util.BinaryStorageBuffer.TypeSerializer;
 
-namespace GunsOPlenty.Stuff
+namespace GunsOPlenty.Data
 {
-    public static class TrashCan
+    public static class AssetHandler
     {
-        public static AssetBundle bundle = AssetBundle.LoadFromStream(Assembly.GetExecutingAssembly().GetManifestResourceStream("GunsOPlenty.assets.gop_assets"));
+        public static AssetBundle bundle;
+        public static bool bundleLoaded = false;
+        public static void LoadBundle()
+        {
+            if (bundleLoaded)
+            {
+                Debug.Log("Bundle already loaded");
+                return;
+            }
+            bundle = AssetBundle.LoadFromFile(Path.Combine(GOPUtils.ModDir(), "gop_assets"));
+            if (bundle != null )
+            {
+                Debug.Log("Bundle successfully loaded");
+                bundleLoaded = true;
+            } else
+            {
+                Debug.Log("Bundle failed to loaded");
+                bundleLoaded = false;
+            }
+        }
+
+        public static T LoadAsset<T>(string name) where T : UnityEngine.Object
+        {
+            if (!bundleLoaded)
+            {
+                Debug.Log("Bundle is not loaded");
+                return null;
+            }
+
+            T asset = bundle.LoadAsset<T>(name);
+            if (asset == null)
+            {
+                Debug.Log(name + " didn't load");
+            }
+            return asset;
+        }
+
+        public static void UnloadBundle()
+        {
+            if (!bundleLoaded)
+            {
+                Debug.Log("Bundle already unloaded");
+                return;
+            }
+            Debug.Log("Bundle succesfully unloaded");
+            bundle.Unload(true);
+            bundle = null;
+        }
+
+        public static void CreateCustomPrefabs()
+        {
+            coinShot = LoadAsset<GameObject>("Testo");
+            coinShot.name = "Coin Shot";
+            coinShot.AddComponent<CoinShot>();
+        }
+        public static GameObject coinShot;
+
     }
+
     public static class PrefabBox
     {
         public static GameObject beam = Addressables.LoadAssetAsync<GameObject>("Assets/Prefabs/Attacks and Projectiles/Hitscan Beams/Revolver Beam.prefab").WaitForCompletion();
@@ -32,7 +82,7 @@ namespace GunsOPlenty.Stuff
         public static GameObject cannonball = Addressables.LoadAssetAsync<GameObject>("Assets/Prefabs/Attacks and Projectiles/Cannonball.prefab").WaitForCompletion();
         public static GameObject progHomingExpl = Addressables.LoadAssetAsync<GameObject>("Assets/Prefabs/Attacks and Projectiles/Projectile Homing Explosive.prefab").WaitForCompletion();
         public static GameObject gutterbeam = Addressables.LoadAssetAsync<GameObject>("Assets/Prefabs/Attacks and Projectiles/Hitscan Beams/Gutterman Beam.prefab").WaitForCompletion();
-        
+        public static GameObject gutterRocket = Addressables.LoadAssetAsync<GameObject>("Assets/Prefabs/Attacks and Projectiles/RocketEnemy.prefab").WaitForCompletion();
     }
     public static class ShaderBox
     {
@@ -46,10 +96,11 @@ namespace GunsOPlenty.Stuff
         //it works, my life is complete
         public static async void GetAddressKeys()
         {
-            AsyncOperationHandle<IResourceLocator> thingy = Addressables.LoadContentCatalogAsync(GOPUtils.GameDirectory() + "\\ULTRAKILL_Data\\StreamingAssets\\aa\\catalog.json");
+            /*AsyncOperationHandle<IResourceLocator> thingy = Addressables.LoadContentCatalogAsync(GOPUtils.GameDirectory() + "\\ULTRAKILL_Data\\StreamingAssets\\aa\\catalog.json");
             await thingy.Task;
             List<string> addressKeys = new List<string>();
             IResourceLocator resLocator = thingy.Result;
+            if (resLocator != null)
             if (resLocator != null)
             {
                 Debug.Log("YEAAAAAAH");
@@ -62,7 +113,7 @@ namespace GunsOPlenty.Stuff
             } else
             {
                 Debug.Log("Aw fiddlesticks");
-            }
+            }*/
             
         }
     }

@@ -1,4 +1,6 @@
-﻿using GunsOPlenty.Stuff;
+﻿using GunsOPlenty.Data;
+using GunsOPlenty.Stuff;
+using GunsOPlenty.Utils;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
@@ -11,22 +13,12 @@ namespace GunsOPlenty.Weapons
     {
         private void Start()
         {
-            // it literally only works here, I'll polish this later
-            if (!MonoSingleton<StyleHUD>.instance.idNameDict.ContainsKey("ultrakill.moneyshot"))
-            {
-                MonoSingleton<StyleHUD>.instance.idNameDict.Add("ultrakill.moneyshot", "<color=#ffb700>MONEY SHOT</color>");
-            }
-
-            if (!MonoSingleton<StyleHUD>.instance.freshnessDecayMultiplierDict.ContainsKey("ultrakill.moneyshot"))
-            {
-                MonoSingleton<StyleHUD>.instance.freshnessDecayMultiplierDict.Add("ultrakill.moneyshot", 0f);
-            }
-
+            
             this.cam = MonoSingleton<CameraController>.Instance.GetComponent<Camera>();
             this.gc = MonoSingleton<GunControl>.Instance.GetComponent<GunControl>();
             this.camObj = this.cam.gameObject;
             this.cc = MonoSingleton<CameraController>.Instance;
-            this.coinShot = TrashCan.bundle.LoadAsset<GameObject>("CoinShot");
+            this.coinShot = AssetHandler.coinShot;
             this.coinShotComp = coinShot.GetComponent<CoinShot>();
             this.coinShotComp.sourceWeapon = base.gameObject;
             this.coinShotComp.ignoreCoins = true;
@@ -45,7 +37,7 @@ namespace GunsOPlenty.Weapons
             {
                 this.weaponIcon.weaponDescriptor = ScriptableObject.CreateInstance<WeaponDescriptor>();
                 this.weaponIcon.weaponDescriptor.variationColor = WeaponVariant.GoldVariant;
-                this.weaponIcon.weaponDescriptor.icon = TrashCan.bundle.LoadAsset<Sprite>("Trollface");
+                this.weaponIcon.weaponDescriptor.icon = AssetHandler.LoadAsset<Sprite>("Trollface");
                 this.weaponIcon.weaponDescriptor.glowIcon = this.weaponIcon.weaponDescriptor.icon;
             }
 
@@ -59,7 +51,8 @@ namespace GunsOPlenty.Weapons
             {
                 shouldFire1 = MonoSingleton<InputManager>.Instance.InputSource.Fire1.IsPressed;
                 shouldFire2 = MonoSingleton<InputManager>.Instance.InputSource.Fire2.IsPressed;
-            } else
+            }
+            else
             {
                 shouldFire1 = MonoSingleton<InputManager>.Instance.InputSource.Fire1.WasPerformedThisFrame;
                 shouldFire2 = MonoSingleton<InputManager>.Instance.InputSource.Fire2.WasPerformedThisFrame;
@@ -81,12 +74,12 @@ namespace GunsOPlenty.Weapons
             if (gunReady)
             {
                 gunReady = false;
-                triggerAud.clip = TrashCan.bundle.LoadAsset<AudioClip>("Click");
+                triggerAud.clip = AssetHandler.LoadAsset<AudioClip>("Click");
                 triggerAud.Play();
                 if (pumps > 0)
                 {
                     anim.SetTrigger("Shoot");
-                    gunTipAud.clip = TrashCan.bundle.LoadAsset<AudioClip>("ShotgunBoom");
+                    gunTipAud.clip = AssetHandler.LoadAsset<AudioClip>("ShotgunBoom");
                     gunTipAud.pitch = Random.Range(1.4f, 1.6f);
                     gunTipAud.Play();
                     switch (pumps)
@@ -161,13 +154,13 @@ namespace GunsOPlenty.Weapons
         {
             if (pumps >= 3)
             {
-                pumpAud.clip = TrashCan.bundle.LoadAsset<AudioClip>("BigCha");
+                pumpAud.clip = AssetHandler.LoadAsset<AudioClip>("BigCha");
                 pumpAud.pitch = 1f;
                 pumpAud.Play();
             }
             else
             {
-                pumpAud.clip = TrashCan.bundle.LoadAsset<AudioClip>("Cha");
+                pumpAud.clip = AssetHandler.LoadAsset<AudioClip>("Cha");
                 pumpAud.pitch = 1f - pumps * 0.08f;
                 pumpAud.Play();
             }
@@ -177,13 +170,13 @@ namespace GunsOPlenty.Weapons
         {
             if (pumps >= 3)
             {
-                pumpAud.clip = TrashCan.bundle.LoadAsset<AudioClip>("BigChing");
+                pumpAud.clip = AssetHandler.LoadAsset<AudioClip>("BigChing");
                 pumpAud.pitch = 1f;
                 pumpAud.Play();
             }
             else
             {
-                pumpAud.clip = TrashCan.bundle.LoadAsset<AudioClip>("Ching");
+                pumpAud.clip = AssetHandler.LoadAsset<AudioClip>("Ching");
                 pumpAud.pitch = 1f - pumps * 0.08f;
                 pumpAud.Play();
             }
@@ -222,49 +215,35 @@ namespace GunsOPlenty.Weapons
     }
     public class GoldenGun : GOPWeapon
     {
-        public static GameObject weaponPrefab;
-
-        public static void LoadAssets()
+        public override GameObject Asset { get; protected set; }
+        public override int Slot { get; protected set; }
+        public override string Name { get; protected set; }
+        public override void Setup()
         {
-            // probably an infinitly better way to do this but idk how
-            weaponPrefab = TrashCan.bundle.LoadAsset<GameObject>("Golden Gun Prefab");
-            weaponPrefab.AddComponent<GoldenGunSoul>();
-            foreach (GameObject go in GOPUtils.DescendantsList(weaponPrefab))
+            Asset = AssetHandler.LoadAsset<GameObject>("Golden Gun Prefab");
+            if (Asset != null)
             {
-                if (go.TryGetComponent<MeshRenderer>(out MeshRenderer mr))
+                Name = "Golden Shotgun";
+                Slot = 7;
+                Asset.AddComponent<GoldenGunSoul>();
+                foreach (GameObject thing in GOPUtils.DescendantsList(Asset))
                 {
-                    mr.material.shader = ShaderBox.vertexlit_emissive;
-                }
-                else if (go.TryGetComponent<SkinnedMeshRenderer>(out SkinnedMeshRenderer smr))
-                {
-                    smr.material.shader = ShaderBox.vertexlit_emissive;
+                    if (thing.TryGetComponent<MeshRenderer>(out MeshRenderer mr))
+                    {
+                        mr.material.shader = ShaderBox.vertexlit_emissive;
+                    }
                 }
             }
+            else
+            {
+                Debug.Log("Golden Shotgun Didn't load");
+                Name = "Golden Shotgun is NULL";
+                Slot = -1;
+            }
         }
-
-        public override GameObject Create(Transform parent)
+        /*public override void Create(Transform transform)
         {
-            GameObject Asset = GameObject.Instantiate(weaponPrefab, parent);
-
-            return Asset;
-        }
-        public override int Slot()
-        {
-            return 0;
-        }
-
-        public override int WheelOrder()
-        {
-            return 7;
-        }
-        public override string Name()
-        {
-            return "Golden Shotgun";
-        }
-
-        public override string Pref()
-        {
-            return "ggn0";
-        }
+            LoadedAsset = UnityEngine.Object.Instantiate(Asset, transform);
+        }*/
     }
 }

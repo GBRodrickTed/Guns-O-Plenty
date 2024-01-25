@@ -1,6 +1,8 @@
-﻿using HarmonyLib;
+﻿using GunsOPlenty.Weapons;
+using HarmonyLib;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Tracing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,167 +10,88 @@ using UnityEngine;
 
 namespace GunsOPlenty.Stuff
 {
-    public class WeaponHandler
+    public static class WeaponHandler
     {
-        internal static List<GOPWeapon> WeaponList = new List<GOPWeapon>();
-        internal static List<GOPWeapon> WeaponAddendumBucket = new List<GOPWeapon>();
-        internal static Dictionary<string, int> WeaponOwned = new Dictionary<string, int>();
-        internal static int SlotVar = 0;
-
-        public static void Register(GOPWeapon weapon)
+        static List<GOPWeapon> weapons = new List<GOPWeapon>();
+        public static GOPWeapon weapon;
+        public static GameObject thingy;
+        private static GameObject initObj;
+        public static void AddWeapons()
         {
-            if (weapon.WheelOrder() <= 5) // if it's within the normal gun slots
+            weapons.Add(new TestCube());
+            weapons.Add(new FunnyGun());
+            weapons.Add(new GoldenGun());
+        }
+        public static void SetupWeapons()
+        {
+            AddWeapons();
+            foreach (GOPWeapon weapon in weapons)
             {
-                WeaponList.Add(weapon);
-            } else
-            {
-                WeaponAddendumBucket.Add(weapon);
+                weapon.Setup();
             }
-
-            WeaponOwned.Add("weapon." + weapon.Pref(), 0);
         }
-
-        public static void Patch(Harmony harm)
+        public static void AddGuns()
         {
-            harm.PatchAll(typeof(WeaponRegisterPatchs));
-        }
-
-        public class WeaponRegisterPatchs
-        {
-            [HarmonyPatch(typeof(GunSetter), nameof(GunSetter.ResetWeapons))]
-            [HarmonyPostfix]
-            public static void GiveGuns(GunSetter __instance)
+            foreach (GOPWeapon weapon in weapons)
             {
-                List<List<GameObject>> SlotToList = __instance.GetComponent<GunControl>().slots;
-
-                foreach (GOPWeapon weapon in WeaponList)
+                if (weapon != null)
                 {
-                    if (GameProgressSaver.CheckGear(weapon.Pref()) == 1)
+                    if (weapon.Slot > 0 && weapon.Slot <= MonoSingleton<GunControl>.Instance.slots.Count) // if inside normal slot range
                     {
-                        GameObject created = weapon.Create(__instance.transform);
-                        created.SetActive(false);
-                        SlotToList[weapon.Slot()].Add(created);
+                        weapon.Create(MonoSingleton<GunControl>.Instance.transform);
+                        AddToStyleDict(weapon.LoadedAsset);
+                        weapon.LoadedAsset.SetActive(false);
+                        MonoSingleton<GunControl>.Instance.slots[weapon.Slot - 1].Add(weapon.LoadedAsset);
+                        //MonoSingleton<GunControl>.Instance.allWeapons.Add(initObj); Demonic
+
+                    }
+                    else if (weapon.Slot > MonoSingleton<GunControl>.Instance.slots.Count && weapon.Slot <= 69)
+                    {
+                        weapon.Create(MonoSingleton<GunControl>.Instance.transform);
+                        AddToStyleDict(weapon.LoadedAsset);
+                        weapon.LoadedAsset.SetActive(false);
+                        int slots = (MonoSingleton<GunControl>.Instance.slots.Count);
+                        for (int i = 0; i < (weapon.Slot - slots); i++)
+                        {
+                            MonoSingleton<GunControl>.Instance.slots.Add(new List<GameObject>());
+                        }
+                        MonoSingleton<GunControl>.Instance.slots[weapon.Slot - 1].Add(weapon.LoadedAsset);
                     }
                     else
                     {
-                        WeaponOwned["weapon." + weapon.Pref()] = 0;
+                        Debug.Log("Weapon out of range");
                     }
                 }
-
-                
-                foreach (List<GameObject> slot in SlotToList)
+                else
                 {
-                    while (slot.Remove(null))
-                        ;
+                    Debug.Log("Weapon isn't real");
                 }
             }
+        }
 
-            [HarmonyPatch(typeof(GameProgressSaver), nameof(GameProgressSaver.CheckGear))]
-            [HarmonyPrefix]
-            public static bool CheckGearForCustoms(ref int __result, string gear)
+        /*// yes this is necessary no i don't know why
+        public static void AddStyle()
+        {
+            foreach (GOPWeapon weapon in weapons)
             {
-                foreach (GOPWeapon weapon in WeaponList)
-                {
-                    if (weapon.Pref() == gear)
-                    {
-                        __result = WeaponOwned["weapon." + weapon.Pref()];
-                        return false;
-                    }
-                }
-                return true;
+                AddToStyleDict(weapon.LoadedAsset);
             }
+        }*/
 
-            [HarmonyPatch(typeof(GameProgressSaver), nameof(GameProgressSaver.AddGear))]
-            [HarmonyPrefix]
-            public static bool AddGearForCustoms(string gear)
+        public static void AddToStyleDict(GameObject obj)
+        {
+            if (obj != null && !MonoSingleton<StyleHUD>.Instance.weaponFreshness.ContainsKey(obj))
             {
-                foreach (GOPWeapon weapon in WeaponList)
-                {
-                    if (weapon.Pref() == gear)
-                    {
-                        WeaponOwned["weapon." + weapon.Pref()] = 1;
-                        return false;
-                    }
-                }
-                return true;
+                MonoSingleton<StyleHUD>.Instance.weaponFreshness.Add(obj, 10f);
+                Debug.Log(obj.name + " has been added to dictionary");
             }
-
-            [HarmonyPatch(typeof(GunControl), nameof(GunControl.Start))]
-            [HarmonyPostfix]
-            public static void AddNewSlots(GunControl __instance)
+            else if (MonoSingleton<StyleHUD>.Instance.weaponFreshness.ContainsKey(obj))
             {
-                Debug.Log("Got here");
-
-
-                foreach (GOPWeapon weapon in WeaponAddendumBucket)
-                {
-                    GameObject created = weapon.Create(__instance.transform);
-                    created.SetActive(false);
-                    created.name = weapon.Name();
-                    //__instance.slots[1].Add(created);
-                    // Add empty slots until the slot for the weapon is created
-                    while (__instance.slots.Count < (weapon.WheelOrder() + 1))
-                        __instance.slots.Add(new List<GameObject>());
-                    __instance.slots[weapon.WheelOrder()].Add(created);
-                }
-
-                foreach (var slot in __instance.slots)
-                {
-                    while (slot.Remove(null))
-                        ;
-                }
-
-                /*foreach (List<GameObject> slot in __instance.slots)
-                {
-                    foreach (GameObject thing in slot)
-                    {
-                        Debug.Log(thing.name);
-                    }
-                }*/
-
-                //properly sets last used weapon in a hacky way if it's out of the "Standard" array index
-                if (SlotVar > 6)
-                {
-                    __instance.SwitchWeapon(SlotVar, __instance.slots[SlotVar - 1]);
-                }
-
-                __instance.UpdateWeaponList(true);
-
+                Debug.Log(obj.name + " is already in dictionary");
             }
-
-            [HarmonyPatch(typeof(GunControl), nameof(GunControl.Start))]
-            [HarmonyPrefix]
-            public static void SaveLastWeapon(GunControl __instance)
+            else
             {
-
-                SlotVar = PlayerPrefs.GetInt("CurSlo", 1);
-
-            }
-
-            [HarmonyPatch(typeof(StyleCalculator), nameof(StyleCalculator.HitCalculator))]
-            [HarmonyPostfix]
-            public static void SpecialProjectileStyles(StyleCalculator __instance ,string hitter, string enemyType, string hitLimb, bool dead, EnemyIdentifier eid = null, GameObject sourceWeapon = null)
-            {
-                if (hitter == "coin shot")
-                {
-                    __instance.enemiesShot = true;
-                    if (dead)
-                    {
-                        if (enemyType == "spider") // wtf is a "spider"
-                        {
-                            __instance.AddPoints(100, "ultrakill.bigkill", eid, sourceWeapon);
-                        }
-                        else
-                        {
-                            __instance.AddPoints(50, "ultrakill.kill", eid, sourceWeapon);
-                        }
-                        __instance.gc.AddKill();
-                    }
-                    else
-                    {
-                        __instance.AddPoints(5, "", eid, sourceWeapon);
-                    }
-                }
+                Debug.Log(obj.name + " isn't real");
             }
         }
     }

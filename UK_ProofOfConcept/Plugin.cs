@@ -1,38 +1,45 @@
 ﻿using UnityEngine;
 using BepInEx;
 using HarmonyLib;
-using System.IO;
-using System.Reflection;
-using System.Collections.Generic;
-using System;
 using GunsOPlenty.Stuff;
-using GunsOPlenty.Weapons;
-using UnityEngine.AddressableAssets;
-using UnityEngine.AddressableAssets.ResourceLocators;
+using GunsOPlenty.Utils;
+using GunsOPlenty.Data;
 
-// To anyone looking at this code, please know that I started this when I was a complete unity noob so some of this code is a little wonky.
-// A lot of code is heavily inspired by (if not completely ripped off from) Crashlib
-//https://github.com/KidoHyde/CrashLibs/blob/main
+// To anyone looking at this code, hopefully it works now
+// Inspired by CrashLibs but all the code is my own
+// Feedback is greatly appreciated
+
 namespace GunsOPlenty
 {
     [BepInPlugin(PluginInfo.GUID, PluginInfo.Name, PluginInfo.Version)]
+    
     public class Plugin : BaseUnityPlugin
     {
         Harmony harmony = new Harmony(PluginInfo.GUID);
-        public static string modPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-        public static FunnyGun FunGun;
 
+        public void Awake()
+        {
+            //StartCoroutine(Setup());
+        }
 
         public void Start()
         {
-            WeaponHandler.Patch(harmony);
+            AssetHandler.LoadBundle();
+            if (AssetHandler.bundleLoaded)
+            {
+                AssetHandler.CreateCustomPrefabs();
+                WeaponHandler.SetupWeapons();
+                harmony.PatchAll(typeof(WeaponPatch));
+                harmony.PatchAll(typeof(StylePatch));
+            } else
+            {
+                Debug.Log("GOP couldn't load");
+            }
+        }
 
-            FunnyGun.LoadAssets();
-            GoldenGun.LoadAssets();
-
-            WeaponHandler.Register(new FunnyGun());
-            WeaponHandler.Register(new GoldenGun());
-
+        public void Update()
+        {
+            //Instantiate<GameObject>(asset, MonoSingleton<CameraController>.Instance.transform.position, Quaternion.identity);
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿using GunsOPlenty.Stuff;
+﻿using GunsOPlenty.Data;
+using GunsOPlenty.Stuff;
+using GunsOPlenty.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,11 +23,17 @@ namespace GunsOPlenty.Weapons
             lmask |= GOPUtils.NameToLayerBit("Limb");
             lmask |= GOPUtils.NameToLayerBit("BigCorpse");
             Shoot();
+            base.Invoke("Death", 1f);
+        }
+
+        private void Death()
+        {
+            UObject.Destroy(base.gameObject);
         }
 
         private void Update()
         {
-            UObject.Destroy(base.gameObject);
+            
         }
         private void Shoot()
         {
@@ -35,7 +43,7 @@ namespace GunsOPlenty.Weapons
             int count = 0;
             if (RayHitCheck && ignoreCoins)
             {
-                Coin stupidCoin;
+                Coin stupidCoin = null;
                 RaycastHit rayHit = this.hit;
                 while (true)
                 {
@@ -82,7 +90,7 @@ namespace GunsOPlenty.Weapons
                         eid.DeliverDamage(hitObj, (hitTrans.position - base.transform.position).normalized * 10000f, this.hit.point, power, false, 1f, this.sourceWeapon, false);
                         if (power >= 10)
                         {
-                            MonoSingleton<StyleHUD>.Instance.AddPoints((int)(10*power), "ultrakill.moneyshot", this.sourceWeapon, eid, -1, "", "");
+                            MonoSingleton<StyleHUD>.Instance.AddPoints((int)(10*power), "ultrakill.moneyshot", null, eid, -1, "", "");
                         }
                     }
                 }
@@ -100,7 +108,7 @@ namespace GunsOPlenty.Weapons
         public float power = 1f;
         private GameObject coinPref = PrefabBox.coin;
         public GameObject sourceWeapon;
-        public bool ignoreCoins = false;
+        public bool ignoreCoins = true;
         private LayerMask lmask;
         private RaycastHit hit;
         private EnemyIdentifier eid;

@@ -13,6 +13,8 @@ using GunsOPlenty.Stuff;
 using UnityEngine.Diagnostics;
 using System.Runtime.CompilerServices;
 using ULTRAKILL.Cheats;
+using GunsOPlenty.Utils;
+using GunsOPlenty.Data;
 
 namespace GunsOPlenty.Weapons
 {
@@ -34,7 +36,7 @@ namespace GunsOPlenty.Weapons
             if (weaponIcon.weaponDescriptor == null)
             {
                 this.weaponIcon.weaponDescriptor = ScriptableObject.CreateInstance<WeaponDescriptor>();
-                this.weaponIcon.weaponDescriptor.icon = TrashCan.bundle.LoadAsset<Sprite>("Trollface");
+                this.weaponIcon.weaponDescriptor.icon = AssetHandler.LoadAsset<Sprite>("Trollface");
                 this.weaponIcon.weaponDescriptor.glowIcon = this.weaponIcon.weaponDescriptor.icon;
             }
             gunBarrelAud.clip = null; // for duel power. Why this happen in this gun specifically, idk.
@@ -47,7 +49,6 @@ namespace GunsOPlenty.Weapons
         }
         private void Update()
         {
-
             this.transform.localPosition = new Vector3(0.90f, -0.1f, 1.0f);
             if (NoWeaponCooldown.NoCooldown)
             {
@@ -59,11 +60,12 @@ namespace GunsOPlenty.Weapons
             if (MonoSingleton<InputManager>.Instance.InputSource.Fire1.IsPressed && this.gc.activated && !GameStateManager.Instance.PlayerInputLocked)
             {
                 base.Invoke("Shoot", this.wid.delay);
-            } 
+            }
             else if (MonoSingleton<InputManager>.Instance.InputSource.Fire2.IsPressed && this.gc.activated && !GameStateManager.Instance.PlayerInputLocked)
             {
                 base.Invoke("Ball", this.wid.delay);
-            } else
+            }
+            else
             {
                 if (fireMultDelay < fireMultTime)
                 {
@@ -86,7 +88,7 @@ namespace GunsOPlenty.Weapons
             if (fireDelay < fireTime || NoWeaponCooldown.NoCooldown)
             {
                 anim.SetTrigger("Shoot");
-                gunBarrelAud.clip = TrashCan.bundle.LoadAsset<AudioClip>("FunShoot"); //scratch dot com type beat
+                gunBarrelAud.clip = AssetHandler.LoadAsset<AudioClip>("FunShoot"); //scratch dot com type beat
                 gunBarrelAud.pitch = 0.75f + fireMult * 0.02f;
                 //gunBarrelAud.volume = 1f;
                 gunBarrelAud.Play();
@@ -96,7 +98,7 @@ namespace GunsOPlenty.Weapons
                 if (this.targeter.CurrentTarget && this.targeter.IsAutoAimed)
                 {
                     funbeam.transform.LookAt(this.targeter.CurrentTarget.bounds.center);
-                    funbeam.transform.rotation *= GOPUtils.RandRot(fireMult/100f);
+                    funbeam.transform.rotation *= GOPUtils.RandRot(fireMult / 100f);
                 }
                 fireTime = 0;
                 fireMult += 0.5f;
@@ -108,7 +110,7 @@ namespace GunsOPlenty.Weapons
             if (fireDelay * 2.75f < fireTime || NoWeaponCooldown.NoCooldown)
             {
                 anim.SetTrigger("Shoot");
-                gunBarrelAud.clip = TrashCan.bundle.LoadAsset<AudioClip>("FunBall"); //scratch dot com type beat
+                gunBarrelAud.clip = AssetHandler.LoadAsset<AudioClip>("FunBall"); //scratch dot com type beat
                 gunBarrelAud.pitch = 0.5f + fireMult * 0.02f;
                 //gunBarrelAud.volume = 15f;
                 gunBarrelAud.Play();
@@ -152,53 +154,46 @@ namespace GunsOPlenty.Weapons
         private CameraFrustumTargeter targeter;
         private AudioSource gunBarrelAud;
         private WeaponIcon weaponIcon;
+        private WeaponPos weaponPos;
         private WeaponIdentifier wid;
     }
+
     public class FunnyGun : GOPWeapon
     {
-        public static GameObject weaponPrefab;
-
-        public static void LoadAssets()
+        public override GameObject Asset { get; protected set; }
+        public override GameObject LoadedAsset { get; protected set; }
+        public override int Slot { get; protected set; }
+        public override string Name { get; protected set; }
+        public override void Setup()
         {
-            weaponPrefab = TrashCan.bundle.LoadAsset<GameObject>("Fun Gun Prefab");
-            //weaponPrefab.layer = 13; // the Always on Top layer
-            weaponPrefab.AddComponent<FunnyGunSoul>();
-            foreach (GameObject go in GOPUtils.DescendantsList(weaponPrefab))
+            Asset = AssetHandler.LoadAsset<GameObject>("Fun Gun Prefab");
+            if (Asset != null)
             {
-                if (go.TryGetComponent<MeshRenderer>(out MeshRenderer mr))
+                Name = "Fun Gun :D";
+                Slot = 7;
+                Asset.AddComponent<FunnyGunSoul>();
+                foreach (GameObject thing in GOPUtils.DescendantsList(Asset))
                 {
-                    mr.material.shader = ShaderBox.vertexlit_emissive;
-                }
-                else if (go.TryGetComponent<SkinnedMeshRenderer>(out SkinnedMeshRenderer smr))
-                {
-                    smr.material.shader = ShaderBox.vertexlit_emissive;
+                    if (thing.TryGetComponent<MeshRenderer>(out MeshRenderer mr))
+                    {
+                        mr.material.shader = ShaderBox.vertexlit_emissive;
+                    }
+                    else if (thing.TryGetComponent<SkinnedMeshRenderer>(out SkinnedMeshRenderer smr))
+                    {
+                        smr.material.shader = ShaderBox.vertexlit_emissive;
+                    }
                 }
             }
+            else
+            {
+                Debug.Log("Fun Gun Didn't load");
+                Name = "Fun Gun is NULL";
+                Slot = -1;
+            }
         }
-
-        public override GameObject Create(Transform parent)
+        /*public override void Create(Transform transform)
         {
-            GameObject Asset = GameObject.Instantiate(weaponPrefab, parent);
-
-            return Asset;
-        }
-        public override int Slot()
-        {
-            return 0;
-        }
-
-        public override int WheelOrder()
-        {
-            return 7;
-        }
-        public override string Name()
-        {
-            return "Fun Gun :D";
-        }
-
-        public override string Pref()
-        {
-            return "fun0";
-        }
+            LoadedAsset = UnityEngine.Object.Instantiate(Asset, transform);
+        }*/
     }
 }
