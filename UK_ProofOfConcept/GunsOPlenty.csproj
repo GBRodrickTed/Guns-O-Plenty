@@ -46,6 +46,9 @@
     <Reference Include="BepInEx.Harmony">
       <HintPath>libs\BepinEx\BepInEx.Harmony.dll</HintPath>
     </Reference>
+    <Reference Include="PluginConfigurator">
+      <HintPath>libs\EternalsTeam-PluginConfigurator-1.8.4\plugins\PluginConfigurator\PluginConfigurator.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -83,9 +86,17 @@
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>libs\Managed\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.ParticleSystemModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>libs\Managed\UnityEngine.ParticleSystemModule.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine.PhysicsModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>libs\Managed\UnityEngine.PhysicsModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.TextRenderingModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>libs\Managed\UnityEngine.TextRenderingModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.UI, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -94,6 +105,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Data\AssetBox.cs" />
+    <Compile Include="Utils\ConfigManager.cs" />
+    <Compile Include="Weapons\Test Cube\BeeThing.cs" />
+    <Compile Include="Weapons\Test Cube\FireArea.cs" />
+    <Compile Include="Weapons\Test Cube\Generator.cs" />
     <Compile Include="Weapons\Test Cube\TestCube.cs" />
     <Compile Include="Weapons\GOPWeapon.cs" />
     <Compile Include="Utils\HMRPlus.cs" />

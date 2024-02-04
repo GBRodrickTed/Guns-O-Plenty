@@ -4,6 +4,9 @@ using HarmonyLib;
 using GunsOPlenty.Stuff;
 using GunsOPlenty.Utils;
 using GunsOPlenty.Data;
+using PluginConfig.API;
+using UnityEngine.SceneManagement;
+using PluginConfig.API.Fields;
 
 // To anyone looking at this code, hopefully it works now
 // Inspired by CrashLibs but all the code is my own
@@ -16,7 +19,7 @@ namespace GunsOPlenty
     public class Plugin : BaseUnityPlugin
     {
         Harmony harmony = new Harmony(PluginInfo.GUID);
-
+        bool firstTime = true;
         public void Awake()
         {
             //StartCoroutine(Setup());
@@ -24,6 +27,7 @@ namespace GunsOPlenty
 
         public void Start()
         {
+            ConfigManager.Setup();
             AssetHandler.LoadBundle();
             if (AssetHandler.bundleLoaded)
             {
@@ -31,15 +35,35 @@ namespace GunsOPlenty
                 WeaponHandler.SetupWeapons();
                 harmony.PatchAll(typeof(WeaponPatch));
                 harmony.PatchAll(typeof(StylePatch));
-            } else
+            }
+
+            if (ConfigManager.StartupCheck.value)
             {
-                Debug.Log("GOP couldn't load");
+                SceneManager.activeSceneChanged += OnSceneChange;
             }
         }
 
         public void Update()
         {
-            //Instantiate<GameObject>(asset, MonoSingleton<CameraController>.Instance.transform.position, Quaternion.identity);
+            ConfigManager.Update();
+        }
+        void OnSceneChange(Scene before, Scene after)
+        {
+            if (SceneHelper.CurrentScene == "Main Menu" && firstTime && ConfigManager.StartupCheck.value)
+            {
+                if (AssetHandler.bundleLoaded)
+                {
+                    MonoSingleton<HMRPlus>.Instance.SendHudMessageEffect(
+                    "Guns O' Plenty <grad=rainbow>Successfully</grad> Loaded!"
+                    , 0, 4f, false, 1 / 2f);
+                } else
+                {
+                    MonoSingleton<HMRPlus>.Instance.SendHudMessageEffect(
+                    "Guns O' Plenty <grad=crimson>Failed</grad> to Load!"
+                    , 0, 4f, false, 1 / 2f);
+                }
+                firstTime = false;
+            }
         }
     }
 }

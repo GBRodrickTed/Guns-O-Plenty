@@ -27,6 +27,7 @@ namespace GunsOPlenty.Utils
                 newMessage = newMessage.Replace('$', '\n');
                 newMessage = newMessage.Replace("</grad>", "</color>");
                 newMessage = newMessage.Replace("<grad=rainbow>", "<color=#"+ GOPUtils.ColorToHexString(GOPUtils.LerpColorArrayNorm(GOPUtils.RainbowGrad, gradTime)) + ">");
+                newMessage = newMessage.Replace("<grad=crimson>", "<color=#" + GOPUtils.ColorToHexString(GOPUtils.LerpColorArrayNorm(GOPUtils.CrimsonGrad, gradTime)) + ">");
                 newMessage = newMessage.Replace("<grad=fire>", "<color=#" + GOPUtils.ColorToHexString(GOPUtils.LerpColorArrayNorm(GOPUtils.FireGrad, gradTime)) + ">");
                 MonoSingleton<HudMessageReceiver>.Instance.text.text = newMessage;
                 //MonoSingleton<HudMessageReceiver>.Instance.text.text = "<color=#" +  + ">testop</color>\n";

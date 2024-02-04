@@ -90,7 +90,7 @@ namespace GunsOPlenty.Weapons
                         eid.DeliverDamage(hitObj, (hitTrans.position - base.transform.position).normalized * 10000f, this.hit.point, power, false, 1f, this.sourceWeapon, false);
                         if (power >= 10)
                         {
-                            MonoSingleton<StyleHUD>.Instance.AddPoints((int)(10*power), "ultrakill.moneyshot", null, eid, -1, "", "");
+                            MonoSingleton<StyleHUD>.Instance.AddPoints((int)(10*power), "ultrakill.moneyshot", sourceWeapon, eid, -1, "", "");
                         }
                     }
                 }

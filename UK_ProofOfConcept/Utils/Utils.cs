@@ -27,6 +27,12 @@ namespace GunsOPlenty.Utils
             new Color(1, 0.5f, 0)
         };
 
+        public static Color[] CrimsonGrad =
+        {
+            new Color(0.85f, 0, 0),
+            new Color(0.15f, 0, 0)
+        };
+
         public static Color[] DarkBlueGrad =
         {
             HexToColor("#373B44"),
@@ -47,8 +53,9 @@ namespace GunsOPlenty.Utils
 
         public static Color LerpColorArrayNorm(Color[] grad, float t)
         {
-            float n = (t * grad.Length) % grad.Length;
-            return Color.Lerp(grad[(int)Math.Floor(n)], grad[(int)Math.Ceiling(n) % (grad.Length)], n - (int)Math.Floor(n));
+            return LerpColorArray(grad, t * grad.Length);
+            //float n = (t * grad.Length) % grad.Length;
+            //return Color.Lerp(grad[(int)Math.Floor(n)], grad[(int)Math.Ceiling(n) % (grad.Length)], n - (int)Math.Floor(n));
         }
         public static string IntsToHexString(int r, int g, int b)
         {
@@ -202,5 +209,7 @@ namespace GunsOPlenty.Utils
             }
             return layer;
         }
+
+        // maybe https://stackoverflow.com/questions/62553142/how-to-copy-values-of-a-component-from-object-a-to-the-same-component-on-object
     }
 }

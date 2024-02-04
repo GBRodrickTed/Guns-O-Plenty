@@ -1,4 +1,5 @@
-﻿using GunsOPlenty.Weapons;
+﻿using GunsOPlenty.Utils;
+using GunsOPlenty.Weapons;
 using HarmonyLib;
 using System;
 using System.Collections.Generic;
@@ -13,31 +14,119 @@ namespace GunsOPlenty.Stuff
     public static class WeaponHandler
     {
         static List<GOPWeapon> weapons = new List<GOPWeapon>();
-        public static GOPWeapon weapon;
         public static GameObject thingy;
         private static GameObject initObj;
         public static void AddWeapons()
         {
-            weapons.Add(new TestCube());
-            weapons.Add(new FunnyGun());
-            weapons.Add(new GoldenGun());
+            
         }
         public static void SetupWeapons()
         {
-            AddWeapons();
+            Debug.Log("Setting up weapon");
+            /*if (ConfigManager.FunGunEnable.value) 
+            { 
+                GOPWeapon weapon = new FunnyGun();
+                weapons.Add(weapon); 
+            }
+            if (ConfigManager.GoldenGunEnable.value)
+            {
+                GOPWeapon weapon = new GoldenGun();
+                weapons.Add(weapon);
+            }
+            if (ConfigManager.TestCubeEnable.value)
+            {
+                GOPWeapon weapon = new TestCube();
+                weapons.Add(weapon);
+            }*/
+            weapons.Add(new FunnyGun());
+            weapons.Add(new GoldenGun());
+            weapons.Add(new TestCube());
             foreach (GOPWeapon weapon in weapons)
             {
-                weapon.Setup();
+                if (!weapon.IsSetup)
+                {
+                    weapon.Setup();
+                }
+            }
+            foreach (GOPWeapon weapon in weapons)
+            {
+                foreach(Component comp in weapon.Asset.GetComponents(typeof(Component)))
+                {
+                    Debug.Log(weapon.Name + ": " + comp.GetType().Name);
+                }
             }
         }
-        public static void AddGuns()
+        public static void RemoveWeapons()
+        {
+            Debug.Log("Removing weapons");
+            foreach (GOPWeapon gopWeapon in weapons)
+            {
+                foreach(var slot in MonoSingleton<GunControl>.Instance.slots)
+                {
+                    foreach(var weapon in slot)
+                    {
+                        if (weapon == gopWeapon.LoadedAsset)
+                        {
+                            Debug.Log("Removing: " + weapon.name);
+                            slot.Remove(weapon);
+                        }
+                    }
+                    //gopWeapon.UnSetup();
+                }
+            }
+            foreach (var slot in MonoSingleton<GunControl>.Instance.slots)
+            {
+                if (slot.Count == 0)
+                {
+                    MonoSingleton<GunControl>.Instance.slots.Remove(slot);
+                    Debug.Log("Removing an empty weapon slot");
+                }
+            }
+            weapons.Clear();
+        }
+        public static void AddWeaponsToInventoy()
         {
             foreach (GOPWeapon weapon in weapons)
             {
-                if (weapon != null)
+                switch(weapon.Name) // TODO: there must be a better way
+                {
+                    case "Funny Gun :D":
+                        weapon.ShouldHave = ConfigManager.FunGunEnable.value;
+                        weapon.Slot = ConfigManager.FunGunSlot.value;
+                        break;
+                    case "Golden Shotgun":
+                        weapon.ShouldHave = ConfigManager.GoldenGunEnable.value;
+                        weapon.Slot = ConfigManager.GoldenGunSlot.value;
+                        break;
+                    case "Test Cube":
+                        weapon.ShouldHave = ConfigManager.TestCubeEnable.value;
+                        weapon.Slot = ConfigManager.TestCubeSlot.value;
+                        break;
+                    default:
+                        Debug.Log("ummm dafuq?");
+                        break;
+                }
+                if (weapon.ShouldHave)
+                {
+                    weapon.Create(MonoSingleton<GunControl>.Instance.transform);
+                    MonoSingleton<GunControl>.Instance.shud.weaponFreshness.Add(weapon.LoadedAsset, 10f);
+                    weapon.LoadedAsset.SetActive(false);
+                    int slots = (MonoSingleton<GunControl>.Instance.slots.Count);
+                    if (weapon.Slot > slots)
+                    {
+                        for (int i = 0; i < (weapon.Slot - slots); i++)
+                        {
+                            MonoSingleton<GunControl>.Instance.slots.Add(new List<GameObject>());
+                        }
+                    }
+                    MonoSingleton<GunControl>.Instance.slots[weapon.Slot - 1].Add(weapon.LoadedAsset);
+                }
+                MonoSingleton<GunControl>.Instance.UpdateWeaponList(true);
+                /*if (weapon != null)
                 {
                     if (weapon.Slot > 0 && weapon.Slot <= MonoSingleton<GunControl>.Instance.slots.Count) // if inside normal slot range
                     {
+                        Debug.Log("In notmal slots");
                         weapon.Create(MonoSingleton<GunControl>.Instance.transform);
                         AddToStyleDict(weapon.LoadedAsset);
                         weapon.LoadedAsset.SetActive(false);
@@ -47,6 +136,7 @@ namespace GunsOPlenty.Stuff
                     }
                     else if (weapon.Slot > MonoSingleton<GunControl>.Instance.slots.Count && weapon.Slot <= 69)
                     {
+                        Debug.Log("NOT In notmal slots: " + weapon.Slot + ", " + MonoSingleton<GunControl>.Instance.slots.Count);
                         weapon.Create(MonoSingleton<GunControl>.Instance.transform);
                         AddToStyleDict(weapon.LoadedAsset);
                         weapon.LoadedAsset.SetActive(false);
@@ -65,18 +155,18 @@ namespace GunsOPlenty.Stuff
                 else
                 {
                     Debug.Log("Weapon isn't real");
-                }
+                }*/
             }
         }
 
-        /*// yes this is necessary no i don't know why
+        // yes this is necessary no i don't know why
         public static void AddStyle()
         {
             foreach (GOPWeapon weapon in weapons)
             {
                 AddToStyleDict(weapon.LoadedAsset);
             }
-        }*/
+        }
 
         public static void AddToStyleDict(GameObject obj)
         {

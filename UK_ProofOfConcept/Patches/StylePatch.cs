@@ -1,4 +1,5 @@
-﻿using HarmonyLib;
+﻿using GunsOPlenty.Utils;
+using HarmonyLib;
 using UnityEngine;
 
 namespace GunsOPlenty.Stuff
@@ -10,24 +11,36 @@ namespace GunsOPlenty.Stuff
         [HarmonyPrefix]
         public static bool no(LeaderboardController __instance)
         {
-            Debug.Log("no");
-            return false;
+            if (ConfigManager.FunGunEnable.value || ConfigManager.GoldenGunEnable.value || ConfigManager.TestCubeEnable.value)
+            {
+                Debug.Log("no");
+                return false;
+            }
+            return true;
         }
 
         [HarmonyPatch(typeof(LeaderboardController), nameof(LeaderboardController.SubmitLevelScore))]
         [HarmonyPrefix]
         public static bool nope(LeaderboardController __instance)
         {
-            Debug.Log("nope");
-            return false;
+            if (ConfigManager.FunGunEnable.value || ConfigManager.GoldenGunEnable.value || ConfigManager.TestCubeEnable.value)
+            {
+                Debug.Log("nope");
+                return false;
+            }
+            return true;
         }
 
         [HarmonyPatch(typeof(LeaderboardController), nameof(LeaderboardController.SubmitFishSize))]
         [HarmonyPrefix]
         public static bool notevenfish(LeaderboardController __instance)
         {
-            Debug.Log("not even fish");
-            return false;
+            if (ConfigManager.FunGunEnable.value || ConfigManager.GoldenGunEnable.value || ConfigManager.TestCubeEnable.value)
+            {
+                Debug.Log("not even fish");
+                return false;
+            }
+            return true;
         }
 
         [HarmonyPatch(typeof(StyleHUD), nameof(StyleHUD.Start))]
@@ -36,15 +49,15 @@ namespace GunsOPlenty.Stuff
         {
             /*__instance.idNameDict.Add("ultrakill.moneyshot", "<color=#ffb700>MONEY SHOT</color>");
             __instance.freshnessDecayMultiplierDict.Add("ultrakill.moneyshot", 0f);*/
-            if (!MonoSingleton<StyleHUD>.instance.idNameDict.ContainsKey("ultrakill.moneyshot"))
+            /*if (!MonoSingleton<StyleHUD>.Instance.idNameDict.ContainsKey("ultrakill.moneyshot"))
             {
-                MonoSingleton<StyleHUD>.instance.idNameDict.Add("ultrakill.moneyshot", "<color=#ffb700>MONEY SHOT</color>");
+                MonoSingleton<StyleHUD>.Instance.idNameDict.Add("ultrakill.moneyshot", "<color=#ffb700>MONEY SHOT</color>");
             }
 
-            if (!MonoSingleton<StyleHUD>.instance.freshnessDecayMultiplierDict.ContainsKey("ultrakill.moneyshot"))
+            if (!MonoSingleton<StyleHUD>.Instance.freshnessDecayMultiplierDict.ContainsKey("ultrakill.moneyshot"))
             {
-                MonoSingleton<StyleHUD>.instance.freshnessDecayMultiplierDict.Add("ultrakill.moneyshot", 0f);
-            }
+                MonoSingleton<StyleHUD>.Instance.freshnessDecayMultiplierDict.Add("ultrakill.moneyshot", 0f);
+            }*/
         }
 
         [HarmonyPatch(typeof(StyleCalculator), nameof(StyleCalculator.HitCalculator))]
@@ -58,18 +71,18 @@ namespace GunsOPlenty.Stuff
                 {
                     if (enemyType == "spider") // wtf is a "spider"
                     {
-                        __instance.AddPoints(100, "ultrakill.bigkill", eid, null);
+                        __instance.AddPoints(100, "ultrakill.bigkill", eid, sourceWeapon);
                     }
                     else
                     {
-                        __instance.AddPoints(50, "ultrakill.kill", eid, null);
+                        __instance.AddPoints(50, "ultrakill.kill", eid, sourceWeapon);
                     }
                     __instance.gc.AddKill();
                 }
                 else
                 {
                     //Debug.Log(sourceWeapon.name);
-                   __instance.AddPoints(5, "", eid, null);
+                   __instance.AddPoints(5, "", eid, sourceWeapon);
                 }
             }
         }

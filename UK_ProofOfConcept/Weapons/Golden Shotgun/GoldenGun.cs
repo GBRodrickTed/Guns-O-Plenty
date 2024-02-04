@@ -29,10 +29,11 @@ namespace GunsOPlenty.Weapons
             this.targeter = MonoSingleton<CameraFrustumTargeter>.instance;
             this.anim = GOPUtils.DescendantByName(this.gameObject, "golden_shotgun").GetComponent<Animator>();
 
-            base.gameObject.TryGetComponent<WeaponIdentifier>(out this.wid);
-
+            this.wid = base.gameObject.GetComponent<WeaponIdentifier>();
             this.weaponIcon = this.gameObject.AddComponent<WeaponIcon>();
-
+            this.wpos = this.gameObject.AddComponent<WeaponPos>();
+            this.wpos.defaultPos = new Vector3(0.6129f, -1.5981f, 1.5654f);//0.7074 -1.4545 1.6654
+            this.wpos.middlePos = new Vector3(-0.08f, -1.5981f, 1.5654f);
             if (weaponIcon.weaponDescriptor == null)
             {
                 this.weaponIcon.weaponDescriptor = ScriptableObject.CreateInstance<WeaponDescriptor>();
@@ -45,7 +46,7 @@ namespace GunsOPlenty.Weapons
 
         private void Update()
         {
-            this.transform.localPosition = new Vector3(0.50f, -1.25f, 0.50f);
+            //this.transform.localPosition = new Vector3(0.50f, -1.25f, 0.50f);
 
             if (NoWeaponCooldown.NoCooldown)
             {
@@ -212,19 +213,26 @@ namespace GunsOPlenty.Weapons
         private CameraFrustumTargeter targeter;
         private WeaponIcon weaponIcon;
         private WeaponIdentifier wid;
+        private WeaponPos wpos;
     }
     public class GoldenGun : GOPWeapon
     {
         public override GameObject Asset { get; protected set; }
-        public override int Slot { get; protected set; }
+        public override int Slot { get; set; }
         public override string Name { get; protected set; }
+        public override bool IsSetup { get; protected set; }
+        public override bool ShouldHave { get; set; }
         public override void Setup()
         {
-            Asset = AssetHandler.LoadAsset<GameObject>("Golden Gun Prefab");
-            if (Asset != null)
+            if (Asset == null)
+            {
+                Asset = AssetHandler.LoadAsset<GameObject>("Golden Gun Prefab");
+            }
+
+            if (Asset != null && !IsSetup)
             {
                 Name = "Golden Shotgun";
-                Slot = 7;
+                Slot = ConfigManager.GoldenGunSlot.value;
                 Asset.AddComponent<GoldenGunSoul>();
                 foreach (GameObject thing in GOPUtils.DescendantsList(Asset))
                 {
@@ -233,6 +241,7 @@ namespace GunsOPlenty.Weapons
                         mr.material.shader = ShaderBox.vertexlit_emissive;
                     }
                 }
+                IsSetup = true;
             }
             else
             {

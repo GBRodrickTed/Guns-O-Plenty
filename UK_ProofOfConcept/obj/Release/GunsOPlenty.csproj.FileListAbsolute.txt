@@ -88,3 +88,5 @@ C:\Users\theca\Documents\Coding Stuff\CVS Deluxe\VS\United Kingdom\UK_ProofOfCon
 C:\Users\theca\Documents\Coding Stuff\CVS Deluxe\VS\United Kingdom\UK_ProofOfConcept\UK_ProofOfConcept\obj\Release\GunsOPlenty.csproj.CopyComplete
 C:\Users\theca\Documents\Coding Stuff\CVS Deluxe\VS\United Kingdom\UK_ProofOfConcept\UK_ProofOfConcept\obj\Release\GunsOPlenty.dll
 C:\Users\theca\Documents\Coding Stuff\CVS Deluxe\VS\United Kingdom\UK_ProofOfConcept\UK_ProofOfConcept\obj\Release\GunsOPlenty.pdb
+C:\Users\theca\Documents\Coding Stuff\CVS Deluxe\VS\United Kingdom\UK_ProofOfConcept\UK_ProofOfConcept\bin\Release\PluginConfigurator.dll
+C:\Users\theca\Documents\Coding Stuff\CVS Deluxe\VS\United Kingdom\UK_ProofOfConcept\UK_ProofOfConcept\bin\Release\PluginConfiguratorComponents.dll

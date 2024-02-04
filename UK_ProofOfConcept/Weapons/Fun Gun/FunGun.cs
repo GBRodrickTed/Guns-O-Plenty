@@ -29,13 +29,17 @@ namespace GunsOPlenty.Weapons
             this.gunBarrel = GOPUtils.DescendantByName(this.gameObject, "ShootPoint");
             this.gunBarrelAud = gunBarrel.GetComponent<AudioSource>();
             this.anim = this.GetComponent<Animator>();
-            this.weaponIcon = this.gameObject.AddComponent<WeaponIcon>();
             this.targeter = MonoSingleton<CameraFrustumTargeter>.instance;
-            base.gameObject.TryGetComponent<WeaponIdentifier>(out this.wid);
 
+            this.wid = base.gameObject.GetComponent<WeaponIdentifier>();
+            this.weaponIcon = this.gameObject.AddComponent<WeaponIcon>();
+            this.wpos = this.gameObject.AddComponent<WeaponPos>();
+            this.wpos.defaultPos = new Vector3(0.731f, -0.3491f, 1.2509f);
+            this.wpos.middlePos = new Vector3(0f, -0.3491f, 1.2509f);
             if (weaponIcon.weaponDescriptor == null)
             {
                 this.weaponIcon.weaponDescriptor = ScriptableObject.CreateInstance<WeaponDescriptor>();
+                this.weaponIcon.weaponDescriptor.variationColor = WeaponVariant.BlueVariant;
                 this.weaponIcon.weaponDescriptor.icon = AssetHandler.LoadAsset<Sprite>("Trollface");
                 this.weaponIcon.weaponDescriptor.glowIcon = this.weaponIcon.weaponDescriptor.icon;
             }
@@ -49,7 +53,7 @@ namespace GunsOPlenty.Weapons
         }
         private void Update()
         {
-            this.transform.localPosition = new Vector3(0.90f, -0.1f, 1.0f);
+            //this.transform.localPosition = new Vector3(0.90f, -0.1f, 1.0f);
             if (NoWeaponCooldown.NoCooldown)
             {
                 fireMult = 100f;
@@ -154,24 +158,30 @@ namespace GunsOPlenty.Weapons
         private CameraFrustumTargeter targeter;
         private AudioSource gunBarrelAud;
         private WeaponIcon weaponIcon;
-        private WeaponPos weaponPos;
+        private WeaponPos wpos;
         private WeaponIdentifier wid;
     }
 
     public class FunnyGun : GOPWeapon
     {
         public override GameObject Asset { get; protected set; }
-        public override GameObject LoadedAsset { get; protected set; }
-        public override int Slot { get; protected set; }
+        public override int Slot { get; set; }
         public override string Name { get; protected set; }
+        public override bool IsSetup { get; protected set; }
+        public override bool ShouldHave { get; set; }
         public override void Setup()
         {
-            Asset = AssetHandler.LoadAsset<GameObject>("Fun Gun Prefab");
-            if (Asset != null)
+            if (Asset == null)
             {
-                Name = "Fun Gun :D";
-                Slot = 7;
+                Asset = AssetHandler.LoadAsset<GameObject>("Fun Gun Prefab");
+            }
+            
+            if (Asset != null && !IsSetup)
+            {
+                Name = "Funny Gun :D";
+                Slot = ConfigManager.FunGunSlot.value;
                 Asset.AddComponent<FunnyGunSoul>();
+                //Asset.AddComponent<WeaponIdentifier>();
                 foreach (GameObject thing in GOPUtils.DescendantsList(Asset))
                 {
                     if (thing.TryGetComponent<MeshRenderer>(out MeshRenderer mr))
@@ -183,6 +193,7 @@ namespace GunsOPlenty.Weapons
                         smr.material.shader = ShaderBox.vertexlit_emissive;
                     }
                 }
+                IsSetup = true;
             }
             else
             {
