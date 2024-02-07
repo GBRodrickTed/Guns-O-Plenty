@@ -17,7 +17,7 @@ namespace GunsOPlenty.Stuff
         [HarmonyPostfix]
         public static void AddGuns(GunControl __instance)
         {
-            Debug.Log("Its doint it");
+            //Debug.Log("Its doint it");
             WeaponHandler.AddWeaponsToInventoy();
         }
 
@@ -42,14 +42,14 @@ namespace GunsOPlenty.Stuff
         [HarmonyPrefix]
         public static void PreUpdateWithGOP(GunControl __instance)
         {
-            Debug.Log("I come in before you");
+            //Debug.Log("I come in before you");
         }
 
         [HarmonyPatch(typeof(GunControl), nameof(GunControl.UpdateWeaponList))]
         [HarmonyPostfix]
         public static void UpdateWithGOP(GunControl __instance)
         {
-            Debug.Log("Funfunfunfunfunfunfun");
+            //Debug.Log("Funfunfunfunfunfunfun");
         }
     }
 }

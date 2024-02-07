@@ -32,14 +32,6 @@ namespace GunsOPlenty.Utils
             funGun.fireMultTime = 0f;
             funGun.fireMultDelay = 0.1f;
 
-            Debug.Log("IN CHARGE MANAGER");
-
-            Debug.Log(funGun.fireDelay);
-            Debug.Log(funGun.fireTime);
-            Debug.Log(funGun.fireMult);
-            Debug.Log(funGun.fireMultTime);
-            Debug.Log(funGun.fireMultDelay);
-
             goldenGun.pumps = 0;
         }
     }

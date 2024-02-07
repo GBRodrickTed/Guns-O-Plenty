@@ -17,7 +17,7 @@ namespace GunsOPlenty.Weapons
     {
         private void Start()
         {
-            Debug.Log("It begins");
+            //Debug.Log("It begins");
             this.targeter = MonoSingleton<CameraFrustumTargeter>.instance;
 
             this.wid = base.gameObject.GetComponent<WeaponIdentifier>();
@@ -76,7 +76,7 @@ namespace GunsOPlenty.Weapons
             TurnFireOff();
             if (thingy != null)
             {
-                Debug.Log("UnDoing it");
+                //Debug.Log("UnDoing it");
                 thingy.deathTime = 30f;
             }
 
@@ -85,7 +85,7 @@ namespace GunsOPlenty.Weapons
         {
             if (thingy != null)
             {
-                Debug.Log("Doing it");
+                //Debug.Log("Doing it");
                 thingy.deathTime = 5f;
             }
         }
@@ -141,7 +141,7 @@ namespace GunsOPlenty.Weapons
             {
                 if (!firePart.isEmitting)
                 {
-                    Debug.Log("Wing");
+                    //Debug.Log("Wing");
                     firePart.Play();
                     bubblePart.Stop();
                     gunTipAud.clip = AssetHandler.LoadAsset<AudioClip>("FlameThrowerFire");

@@ -46,7 +46,6 @@ namespace GunsOPlenty
         public void Update()
         {
             //ConfigManager.Update();
-            Debug.Log(WeaponHandler.isCheating);
         }
         void Startup(Scene before, Scene after)
         {

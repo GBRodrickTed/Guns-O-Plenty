@@ -44,31 +44,13 @@ namespace GunsOPlenty.Weapons
                 this.weaponIcon.weaponDescriptor.glowIcon = this.weaponIcon.weaponDescriptor.icon;
             }
             gunBarrelAud.clip = null; // for duel power. Why this happen in this gun specifically, idk.
-            Debug.Log("BEFORE RETREIVE");
-            Debug.Log(fireDelay);
-            Debug.Log(fireTime);
-            Debug.Log(fireMult);
-            Debug.Log(fireMultTime);
-            Debug.Log(fireMultDelay);
             RetreiveCharges();
-            Debug.Log("AFTER RETREIVE");
-            Debug.Log(fireDelay);
-            Debug.Log(fireTime);
-            Debug.Log(fireMult);
-            Debug.Log(fireMultTime);
-            Debug.Log(fireMultDelay);
         }
 
         private void OnEnable()
         {
             this.gunBarrelAud.Stop();
             RetreiveCharges();
-            Debug.Log("ON ENABLED");
-            Debug.Log(fireDelay);
-            Debug.Log(fireTime);
-            Debug.Log(fireMult);
-            Debug.Log(fireMultTime);
-            Debug.Log(fireMultDelay);
         }
 
         private void RetreiveCharges()
@@ -213,6 +195,7 @@ namespace GunsOPlenty.Weapons
         public override bool ShouldHave { get; set; }
         public override void Setup()
         {
+            Debug.Log("Setting up Fun Gun");
             if (Asset == null)
             {
                 Asset = AssetHandler.LoadAsset<GameObject>("Fun Gun Prefab");

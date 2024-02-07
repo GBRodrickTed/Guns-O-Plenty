@@ -50,17 +50,17 @@ namespace GunsOPlenty.Stuff
                     weapon.Setup();
                 }
             }
-            foreach (GOPWeapon weapon in weapons)
+            /*foreach (GOPWeapon weapon in weapons)
             {
                 foreach(Component comp in weapon.Asset.GetComponents(typeof(Component)))
                 {
                     Debug.Log(weapon.Name + ": " + comp.GetType().Name);
                 }
-            }
+            }*/
         }
         public static void RemoveWeapons()
         {
-            Debug.Log("Removing weapons");
+            //Debug.Log("Removing weapons");
             foreach (GOPWeapon gopWeapon in weapons)
             {
                 foreach(var slot in MonoSingleton<GunControl>.Instance.slots)
@@ -69,7 +69,7 @@ namespace GunsOPlenty.Stuff
                     {
                         if (weapon == gopWeapon.LoadedAsset)
                         {
-                            Debug.Log("Removing: " + weapon.name);
+                            //Debug.Log("Removing: " + weapon.name);
                             slot.Remove(weapon);
                         }
                     }
@@ -81,7 +81,7 @@ namespace GunsOPlenty.Stuff
                 if (slot.Count == 0)
                 {
                     MonoSingleton<GunControl>.Instance.slots.Remove(slot);
-                    Debug.Log("Removing an empty weapon slot");
+                    //Debug.Log("Removing an empty weapon slot");
                 }
             }
             weapons.Clear();

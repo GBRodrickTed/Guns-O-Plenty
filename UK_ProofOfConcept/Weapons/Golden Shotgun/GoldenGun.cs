@@ -239,6 +239,7 @@ namespace GunsOPlenty.Weapons
         public override bool ShouldHave { get; set; }
         public override void Setup()
         {
+            Debug.Log("Setting up Golden Gun");
             if (Asset == null)
             {
                 Asset = AssetHandler.LoadAsset<GameObject>("Golden Gun Prefab");
