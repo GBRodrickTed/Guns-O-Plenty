@@ -1,4 +1,5 @@
-﻿using GunsOPlenty.Utils;
+﻿using Discord;
+using GunsOPlenty.Utils;
 using GunsOPlenty.Weapons;
 using System.Collections.Generic;
 using System.IO;
@@ -22,7 +23,7 @@ namespace GunsOPlenty.Data
                 Debug.Log("Bundle already loaded");
                 return;
             }
-            bundle = AssetBundle.LoadFromFile(Path.Combine(GOPUtils.ModDir(), "gop_assets"));
+            bundle = AssetBundle.LoadFromFile(Path.Combine(Path.Combine(GOPUtils.ModDir(), "Data"), "gop_assets"));
             if (bundle != null )
             {
                 Debug.Log("Bundle successfully loaded");
@@ -71,18 +72,33 @@ namespace GunsOPlenty.Data
             LayerMask testLM = 0;
 
             generator = LoadAsset<GameObject>("Test Thing");
-            generator.GetComponent<MeshRenderer>().material.shader = ShaderBox.vertexlit;
-            generator.AddComponent<OutdoorsChecker>();
-
-            beething = LoadAsset<GameObject>("Test Creature");
-            foreach (GameObject thing in GOPUtils.DescendantsList(beething))
+            //generator.AddComponent<Generator>();
+            foreach (GameObject thing in GOPUtils.DescendantsList(generator))
             {
-                thing.GetComponent<MeshRenderer>().material.shader = ShaderBox.vertexlit;
-                thing.AddComponent<OutdoorsChecker>();
+                MeshRenderer meshR;
+                if (thing.TryGetComponent<MeshRenderer>(out meshR))
+                {
+                    meshR.material.shader = ShaderBox.vertexlit;
+                    thing.AddComponent<OutdoorsChecker>();
+                }
             }
 
+            beething = LoadAsset<GameObject>("Test Creature");
+            //beething.AddComponent<BeeThing>();
+            foreach (GameObject thing in GOPUtils.DescendantsList(beething))
+            {
+                MeshRenderer meshR;
+                if (thing.TryGetComponent<MeshRenderer>(out meshR))
+                {
+                    meshR.material.shader = ShaderBox.vertexlit;
+                    thing.AddComponent<OutdoorsChecker>();
+                }
+            }
+            //generator.GetComponent<Generator>().fred = beething;
             EffectBox.fire = LoadAsset<GameObject>("FlameThrower");
             EffectBox.epicFire = LoadAsset<GameObject>("EpicThrower");
+            EffectBox.bubble = LoadAsset<GameObject>("BubbleThrower");
+            EffectBox.epicBubble = LoadAsset<GameObject>("EpicBubbleThrower");
         }
         public static GameObject coinShot;
         public static GameObject generator;
@@ -92,10 +108,13 @@ namespace GunsOPlenty.Data
 
     public static class PrefabBox
     {
-        public static GameObject boom = Addressables.LoadAssetAsync<GameObject>("Assets/Prefabs/Attacks and Projectiles/Hitscan Beams/Revolver Beam.prefab").WaitForCompletion();
+        public static GameObject boom = Addressables.LoadAssetAsync<GameObject>("Assets/Prefabs/Attacks and Projectiles/Explosions/Explosion.prefab").WaitForCompletion();
+        public static GameObject bigBoom = Addressables.LoadAssetAsync<GameObject>("Assets/Prefabs/Attacks and Projectiles/Explosions/Explosion Big.prefab").WaitForCompletion();
+        public static GameObject superBoom = Addressables.LoadAssetAsync<GameObject>("Assets/Prefabs/Attacks and Projectiles/Explosions/Explosion Super.prefab").WaitForCompletion();
+        public static GameObject harmlessBoom = Addressables.LoadAssetAsync<GameObject>("Assets/Prefabs/Attacks and Projectiles/Explosions/Explosion Rocket Harmless.prefab").WaitForCompletion();
         public static GameObject beam = Addressables.LoadAssetAsync<GameObject>("Assets/Prefabs/Attacks and Projectiles/Hitscan Beams/Revolver Beam.prefab").WaitForCompletion();
-        public static GameObject beamSharp = Addressables.LoadAssetAsync<GameObject>("Assets/Prefabs/Attacks and Projectiles/Hitscan Beams/Revolver Beam Sharp.prefab").WaitForCompletion();
-        public static GameObject beamSharpSuper = Addressables.LoadAssetAsync<GameObject>("Assets/Prefabs/Attacks and Projectiles/Hitscan Beams/Revolver Beam Sharp Alternative.prefab").WaitForCompletion();
+        //public static GameObject beamSharp = Addressables.LoadAssetAsync<GameObject>("Assets/Prefabs/Attacks and Projectiles/Hitscan Beams/Revolver Beam Sharp.prefab").WaitForCompletion();
+        //public static GameObject beamSharpSuper = Addressables.LoadAssetAsync<GameObject>("Assets/Prefabs/Attacks and Projectiles/Hitscan Beams/Revolver Beam Sharp Alternative.prefab").WaitForCompletion();
         public static GameObject coin = Addressables.LoadAssetAsync<GameObject>("Assets/Prefabs/Attacks and Projectiles/Coin.prefab").WaitForCompletion();
         public static GameObject grenade = Addressables.LoadAssetAsync<GameObject>("Assets/Prefabs/Attacks and Projectiles/Grenade.prefab").WaitForCompletion();
         public static GameObject rocket = Addressables.LoadAssetAsync<GameObject>("Assets/Prefabs/Attacks and Projectiles/Rocket.prefab").WaitForCompletion();
@@ -105,7 +124,7 @@ namespace GunsOPlenty.Data
         public static GameObject gutterRocket = Addressables.LoadAssetAsync<GameObject>("Assets/Prefabs/Attacks and Projectiles/RocketEnemy.prefab").WaitForCompletion();
     }
     public static class ShaderBox
-    {//Assets/Particles/Fire.prefab
+    {
         public static Shader vertexlit = Addressables.LoadAssetAsync<Shader>("Assets/Shaders/Main/ULTRAKILL-vertexlit.shader").WaitForCompletion();
         public static Shader psx_abient = Addressables.LoadAssetAsync<Shader>("Assets/Shaders/Main/ULTRAKILL-unlit-ambient.shader").WaitForCompletion();
         public static Shader vertexlit_emissive = Addressables.LoadAssetAsync<Shader>("Assets/Shaders/Main/ULTRAKILL-vertexlit-emissive.shader").WaitForCompletion();
@@ -115,6 +134,8 @@ namespace GunsOPlenty.Data
     {
         public static GameObject fire;
         public static GameObject epicFire;
+        public static GameObject bubble;
+        public static GameObject epicBubble;
     }
 
     public static class WhyDoesGettingAddressableNamesAtRuntimeHaveToBeSoHard

@@ -11,7 +11,7 @@ namespace GunsOPlenty.Stuff
         [HarmonyPrefix]
         public static bool no(LeaderboardController __instance)
         {
-            if (ConfigManager.FunGunEnable.value || ConfigManager.GoldenGunEnable.value || ConfigManager.TestCubeEnable.value)
+            if (WeaponHandler.isCheating)
             {
                 Debug.Log("no");
                 return false;
@@ -23,7 +23,7 @@ namespace GunsOPlenty.Stuff
         [HarmonyPrefix]
         public static bool nope(LeaderboardController __instance)
         {
-            if (ConfigManager.FunGunEnable.value || ConfigManager.GoldenGunEnable.value || ConfigManager.TestCubeEnable.value)
+            if (WeaponHandler.isCheating)
             {
                 Debug.Log("nope");
                 return false;
@@ -35,7 +35,7 @@ namespace GunsOPlenty.Stuff
         [HarmonyPrefix]
         public static bool notevenfish(LeaderboardController __instance)
         {
-            if (ConfigManager.FunGunEnable.value || ConfigManager.GoldenGunEnable.value || ConfigManager.TestCubeEnable.value)
+            if (WeaponHandler.isCheating)
             {
                 Debug.Log("not even fish");
                 return false;

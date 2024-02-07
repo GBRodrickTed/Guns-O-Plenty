@@ -42,6 +42,7 @@ namespace GunsOPlenty.Weapons
                 this.weaponIcon.weaponDescriptor.glowIcon = this.weaponIcon.weaponDescriptor.icon;
             }
 
+            pumps = ChargeManager.goldenGun.pumps;
         }
 
         private void Update()
@@ -182,6 +183,20 @@ namespace GunsOPlenty.Weapons
                 pumpAud.Play();
             }
             pumps += 1;
+            if (this.wid.delay == 0)
+            {
+                ChargeManager.goldenGun.pumps = pumps;
+            }
+        }
+
+        void OnEnable()
+        {
+            pumps = ChargeManager.goldenGun.pumps;
+        }
+
+        void OnDisable()
+        {
+            ChargeManager.goldenGun.pumps = 0;
         }
 
         private int maxShots = 32;

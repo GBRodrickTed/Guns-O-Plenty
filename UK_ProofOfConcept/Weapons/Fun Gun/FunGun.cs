@@ -44,13 +44,51 @@ namespace GunsOPlenty.Weapons
                 this.weaponIcon.weaponDescriptor.glowIcon = this.weaponIcon.weaponDescriptor.icon;
             }
             gunBarrelAud.clip = null; // for duel power. Why this happen in this gun specifically, idk.
-            
+            Debug.Log("BEFORE RETREIVE");
+            Debug.Log(fireDelay);
+            Debug.Log(fireTime);
+            Debug.Log(fireMult);
+            Debug.Log(fireMultTime);
+            Debug.Log(fireMultDelay);
+            RetreiveCharges();
+            Debug.Log("AFTER RETREIVE");
+            Debug.Log(fireDelay);
+            Debug.Log(fireTime);
+            Debug.Log(fireMult);
+            Debug.Log(fireMultTime);
+            Debug.Log(fireMultDelay);
         }
 
         private void OnEnable()
         {
             this.gunBarrelAud.Stop();
+            RetreiveCharges();
+            Debug.Log("ON ENABLED");
+            Debug.Log(fireDelay);
+            Debug.Log(fireTime);
+            Debug.Log(fireMult);
+            Debug.Log(fireMultTime);
+            Debug.Log(fireMultDelay);
         }
+
+        private void RetreiveCharges()
+        {
+            fireDelay = ChargeManager.funGun.fireDelay;
+            fireTime = ChargeManager.funGun.fireTime;
+            fireMult = ChargeManager.funGun.fireMult;
+            fireMultTime = ChargeManager.funGun.fireMultTime;
+            fireMultDelay = ChargeManager.funGun.fireMultDelay;
+        }
+
+        private void StoreCharges()
+        {
+            ChargeManager.funGun.fireDelay = fireDelay;
+            ChargeManager.funGun.fireTime = fireTime;
+            ChargeManager.funGun.fireMult = fireMult;
+            ChargeManager.funGun.fireMultTime = fireMultTime;
+            ChargeManager.funGun.fireMultDelay = fireMultDelay;
+        }
+
         private void Update()
         {
             //this.transform.localPosition = new Vector3(0.90f, -0.1f, 1.0f);
@@ -84,6 +122,10 @@ namespace GunsOPlenty.Weapons
             if (fireMult < 1f)
             {
                 fireMult = 1f;
+            }
+            if (this.wid.delay == 0)
+            {
+                StoreCharges();
             }
         }
 

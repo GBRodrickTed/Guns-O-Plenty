@@ -105,7 +105,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Data\AssetBox.cs" />
+    <Compile Include="Utils\ChargeManager.cs" />
     <Compile Include="Utils\ConfigManager.cs" />
+    <Compile Include="Utils\EnemyColliderDetector.cs" />
     <Compile Include="Weapons\Test Cube\BeeThing.cs" />
     <Compile Include="Weapons\Test Cube\FireArea.cs" />
     <Compile Include="Weapons\Test Cube\Generator.cs" />

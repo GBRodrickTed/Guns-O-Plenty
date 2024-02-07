@@ -39,28 +39,33 @@ namespace GunsOPlenty
 
             if (ConfigManager.StartupCheck.value)
             {
-                SceneManager.activeSceneChanged += OnSceneChange;
+                SceneManager.activeSceneChanged += Startup;
             }
         }
 
         public void Update()
         {
-            ConfigManager.Update();
+            //ConfigManager.Update();
+            Debug.Log(WeaponHandler.isCheating);
         }
-        void OnSceneChange(Scene before, Scene after)
+        void Startup(Scene before, Scene after)
         {
-            if (SceneHelper.CurrentScene == "Main Menu" && firstTime && ConfigManager.StartupCheck.value)
+            if (SceneHelper.CurrentScene == "Main Menu" && firstTime)
             {
-                if (AssetHandler.bundleLoaded)
+                if (ConfigManager.StartupCheck.value)
                 {
-                    MonoSingleton<HMRPlus>.Instance.SendHudMessageEffect(
-                    "Guns O' Plenty <grad=rainbow>Successfully</grad> Loaded!"
-                    , 0, 4f, false, 1 / 2f);
-                } else
-                {
-                    MonoSingleton<HMRPlus>.Instance.SendHudMessageEffect(
-                    "Guns O' Plenty <grad=crimson>Failed</grad> to Load!"
-                    , 0, 4f, false, 1 / 2f);
+                    if (AssetHandler.bundleLoaded)
+                    {
+                        MonoSingleton<HMRPlus>.Instance.SendHudMessageEffect(
+                        "Guns O' Plenty <grad=rainbow>Successfully</grad> Loaded!"
+                        , 0, 4f, false, 1 / 2f);
+                    }
+                    else
+                    {
+                        MonoSingleton<HMRPlus>.Instance.SendHudMessageEffect(
+                        "Guns O' Plenty <grad=crimson>Failed</grad> to Load!"
+                        , 0, 4f, false, 1 / 2f);
+                    }
                 }
                 firstTime = false;
             }

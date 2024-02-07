@@ -98,10 +98,10 @@ namespace GunsOPlenty.Utils
             return Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         }
 
-        public static string GameDir()
+        /*public static string GameDir()
         {
             return Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-        }
+        }*/
 
         public static string ModPath()
         {
@@ -210,6 +210,6 @@ namespace GunsOPlenty.Utils
             return layer;
         }
 
-        // maybe https://stackoverflow.com/questions/62553142/how-to-copy-values-of-a-component-from-object-a-to-the-same-component-on-object
+        // may be useful for test cube particles https://stackoverflow.com/questions/62553142/how-to-copy-values-of-a-component-from-object-a-to-the-same-component-on-object
     }
 }

@@ -1,50 +1,100 @@
-﻿using System;
+﻿using GunsOPlenty.Utils;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using ULTRAKILL.Cheats;
 using UnityEngine;
 
 namespace GunsOPlenty.Weapons
 {
-    //Code similar to how HurtZone works
     public class FireArea : MonoBehaviour
     {
-        public List<EnemyIdentifier> hitlist = new List<EnemyIdentifier>();
-        public List<EnemyIdentifier> toRemove = new List<EnemyIdentifier>();
-        public List<float> hitTimes = new List<float>();
-        public List<int> limbCount = new List<int>();
-
-        public void FixedUpdate()
+        EnemyColliderDetector ecd;
+        public GameObject sourceWeapon;
+        public List<Generator> genlist = new List<Generator>();
+        public List<BeeThing> beelist = new List<BeeThing>();
+        public void Start()
         {
-            if (hitlist.Count > 0)
+            ecd = base.gameObject.AddComponent<EnemyColliderDetector>();
+            if (ecd == null)
             {
-                foreach (EnemyIdentifier eid in hitlist)
+                Debug.Log("Dang");
+            }
+            SlowUpdate();
+        }
+        public void SlowUpdate()
+        {
+            //Debug.Log(MonoSingleton<StyleHUD>.Instance.currentMeter + ", " + MonoSingleton<StyleHUD>.Instance.rankIndex);
+            // 1500 * 7 + 1500 or 12000 is max style 
+            if (base.GetComponent<CapsuleCollider>().enabled == false) //TODO: This is needed for DuelWeild. Find a way to not need it
+            {
+                ClearStuff();
+            }
+            float stylefactor = (MonoSingleton<StyleHUD>.Instance.currentMeter + (MonoSingleton<StyleHUD>.Instance.rankIndex * 1500f));
+            for (int i = 0; i < ecd.hitList.Count; i++)//(EnemyIdentifier eid in ecd.hitList)ecd.hitList[i]
+            {
+                if (ecd.hitList[i] != null && !ecd.hitList[i].dead)
                 {
-                    if (eid != null && !eid.dead)
+                    //TODO: specifically sisyphinian solders don't bleed or die when on fire (does take damage tho)
+                    Flammable flameComp = ecd.hitList[i].GetComponentInChildren<Flammable>();
+                    if (flameComp != null)
                     {
-                        Flammable flameComp = eid.GetComponentInChildren<Flammable>();
-                        if (flameComp != null)
-                        {
-                            flameComp.Burn(10f, true);
-                        }
-                        //TODO: specifically sisyphinian solders don't bleed or die when on fire
-                        eid.DeliverDamage(eid.transform.gameObject, Vector3.zero, eid.transform.position, 1f / 2f, false, 0f, null, false);
+                        flameComp.Burn(5f, true);
+                    }
+                    GameObject hitLimb = ecd.GetLimbs(ecd.hitList[i])[UnityEngine.Random.Range(0, ecd.GetLimbs(ecd.hitList[i]).Count - 1)];
+                    if (ecd.hitList[i].enemyType == EnemyType.Streetcleaner)
+                    {
+                        ecd.hitList[i].DeliverDamage(hitLimb, Vector3.zero, hitLimb.transform.position, 0.25f, false, 0f, sourceWeapon, false);
                     }
                     else
                     {
-                        this.toRemove.Add(eid);
+                        ecd.hitList[i].DeliverDamage(hitLimb, Vector3.zero, hitLimb.transform.position, 1f, false, 0f, sourceWeapon, false);
                     }
+
                 }
-                if (this.toRemove.Count > 0)
+            }
+            if (this.genlist.Count > 0)
+            {
+                for (int i = 0; i < genlist.Count; i++)
                 {
-                    foreach (EnemyIdentifier item in this.toRemove)
+
+                    if (NoWeaponCooldown.NoCooldown)
                     {
-                        this.hitlist.Remove(item);
+                        genlist[i].rotVel += 80f;
                     }
-                    this.toRemove.Clear();
+                    else
+                    {
+                        genlist[i].rotVel += 50f + stylefactor * 0.0025f;//0.002 * 12000 + 26 
+                    }
                 }
+            }
+            if (this.beelist.Count > 0)
+            {
+                for (int i = 0; i < beelist.Count; i++)
+                {
+
+                    if (NoWeaponCooldown.NoCooldown)
+                    {
+                        beelist[i].speed += 55f;
+                    }
+                    else
+                    {
+                        beelist[i].speed += 25f + stylefactor * 0.0025f;
+                    }
+                }
+            }
+            //Debug.Log(this.beelist.Count + ", " + this.genlist.Count);//
+            if (NoWeaponCooldown.NoCooldown)
+            {
+                Invoke("SlowUpdate", 0.07f);
+            }
+            else
+            {
+                Invoke("SlowUpdate", 0.25f - stylefactor * 0.000015f);
             }
         }
         private void OnTriggerEnter(Collider other)
@@ -70,82 +120,47 @@ namespace GunsOPlenty.Weapons
 
         private void Enter(Collider other)
         {
-            if (other.gameObject.layer == 10 || other.gameObject.layer == 11 || other.gameObject.layer == 12 || other.gameObject.layer == 20)
+            Generator gen = other.transform.GetComponentInParent<Generator>();//other.transform.GetComponentInParent<Generator>();;
+            BeeThing bee = other.transform.GetComponentInParent<BeeThing>();
+            if (gen != null)
             {
-                EnemyIdentifierIdentifier eidid;
-                eidid = other.transform.GetComponentInParent<EnemyIdentifierIdentifier>();
-                if (eidid != null && eidid.eid != null && !eidid.eid.dead) //  && eidid.transform.localPosition != Vector3.zero
-                {
-                    if (!this.hitlist.Contains(eidid.eid))
-                    {
-                        Debug.Log("Enter: " + eidid.eid.name);
-                        this.hitlist.Add(eidid.eid);
-                        this.hitTimes.Add(1f);
-                        this.limbCount.Add(1);
-                        if (!base.enabled)
-                        {
-                            return;
-                        }
-                    }
-                    else
-                    {
-                        //adds limb if eid already found
-                        List<int> list = this.limbCount;
-                        int index = this.hitlist.IndexOf(eidid.eid);
-                        int num = list[index];
-                        list[index] = num + 1;
-                    }
-                }
+                //Debug.Log("Enter: Gen");
+                genlist.Add(gen);
+
+            }
+            if (bee != null)
+            {
+                //Debug.Log("Enter: Bee");
+                beelist.Add(bee);
             }
         }
         private void Exit(Collider other)
         {
-            if (other.gameObject.layer == 10 || other.gameObject.layer == 11 || other.gameObject.layer == 12 || other.gameObject.layer == 20)
+            Generator gen = other.transform.GetComponentInParent<Generator>();//other.transform.GetComponentInParent<Generator>();
+            BeeThing bee = other.transform.GetComponentInParent<BeeThing>();
+            if (gen != null && this.genlist.Contains(gen))
             {
-                EnemyIdentifierIdentifier eidid;
-                eidid = other.transform.GetComponentInParent<EnemyIdentifierIdentifier>();
-                if (eidid != null && eidid.eid != null && this.hitlist.Contains(eidid.eid))
-                {
-                    int num = this.hitlist.IndexOf(eidid.eid);
-                    List<int> list = this.limbCount;
-                    int index = num;
-                    int num2 = list[index];
-                    list[index] = num2 - 1;
-                    if (this.limbCount[num] <= 0)
-                    {
-                        Debug.Log("Exit: " + eidid.eid.name);
-                        this.hitTimes.RemoveAt(num);
-                        this.limbCount.RemoveAt(num);
-                        this.hitlist.Remove(eidid.eid);
-                    }
-                }
+                //Debug.Log("Exit: Gen");
+                genlist.Remove(gen);
+
+            }
+            if (bee != null && this.beelist.Contains(bee))
+            {
+                //Debug.Log("Exit: Bee");
+                beelist.Remove(bee);
             }
         }
 
         public void ClearStuff()
         {
-            //clears all enemys in list
-            //Debug.Log("Clearing Stuff");
-            if (this.hitlist.Count > 0)
-            {
-                //Debug.Log("Clearing Stuff");
-                /*foreach (EnemyIdentifier eid in this.hitlist)
-                {
-                    Debug.Log("Removing: " + eid.name);
-                }*/
-                this.hitTimes.Clear();
-                this.limbCount.Clear();
-                this.hitlist.Clear();
-            }
-            //Debug.Log("Clearing Stuff - End");
+            ecd.ClearStuff();
+            this.genlist.Clear();
+            this.beelist.Clear();
         }
 
         private void OnDisable()
         {
-            if (this.hitlist.Count > 0)
-            {
-                ClearStuff();
-            }
+            ClearStuff();
         }
     }
 }

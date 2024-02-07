@@ -16,12 +16,14 @@ namespace GunsOPlenty.Stuff
         static List<GOPWeapon> weapons = new List<GOPWeapon>();
         public static GameObject thingy;
         private static GameObject initObj;
+        public static bool isCheating = false;
         public static void AddWeapons()
         {
             
         }
         public static void SetupWeapons()
         {
+            ChargeManager.Setup();
             Debug.Log("Setting up weapon");
             /*if (ConfigManager.FunGunEnable.value) 
             { 
@@ -86,6 +88,7 @@ namespace GunsOPlenty.Stuff
         }
         public static void AddWeaponsToInventoy()
         {
+            isCheating = false;
             foreach (GOPWeapon weapon in weapons)
             {
                 switch(weapon.Name) // TODO: there must be a better way
@@ -93,14 +96,17 @@ namespace GunsOPlenty.Stuff
                     case "Funny Gun :D":
                         weapon.ShouldHave = ConfigManager.FunGunEnable.value;
                         weapon.Slot = ConfigManager.FunGunSlot.value;
+                        isCheating |= ConfigManager.FunGunEnable.value;
                         break;
                     case "Golden Shotgun":
                         weapon.ShouldHave = ConfigManager.GoldenGunEnable.value;
                         weapon.Slot = ConfigManager.GoldenGunSlot.value;
+                        isCheating |= ConfigManager.GoldenGunEnable.value;
                         break;
                     case "Test Cube":
                         weapon.ShouldHave = ConfigManager.TestCubeEnable.value;
                         weapon.Slot = ConfigManager.TestCubeSlot.value;
+                        isCheating |= ConfigManager.TestCubeEnable.value;
                         break;
                     default:
                         Debug.Log("ummm dafuq?");
