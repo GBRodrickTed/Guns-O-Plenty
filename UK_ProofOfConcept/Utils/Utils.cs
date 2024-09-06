@@ -9,6 +9,28 @@ namespace GunsOPlenty.Utils
 {
     public static class GOPUtils
     {
+        public static string ModDir()
+        {
+            return Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        }
+
+        /*public static string GameDir()
+        {
+            return Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        }*/
+
+        public static string ModPath()
+        {
+            return Assembly.GetExecutingAssembly().Location;
+        }
+        public static string ModDataDir()
+        {
+            return Path.Combine(ModDir(), "Data");
+        }
+        public static string ModSaveDir()
+        {
+            return Path.Combine(ModDataDir(), "Saves");
+        }
         public static Color[] RainbowGrad =
         {
             new Color(1, 0, 0),
@@ -79,7 +101,7 @@ namespace GunsOPlenty.Utils
 
             if (b < 16)
             {
-                bh = "0" + b.ToString("X");
+                bh = "0" + b.ToString("X");//
             }
             else
             {
@@ -93,20 +115,7 @@ namespace GunsOPlenty.Utils
         {
             return IntsToHexString((int)(color.r * 255), (int)(color.g * 255), (int)(color.b * 255));
         }
-        public static string ModDir()
-        {
-            return Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-        }
-
-        /*public static string GameDir()
-        {
-            return Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-        }*/
-
-        public static string ModPath()
-        {
-            return Assembly.GetExecutingAssembly().Location;
-        }
+        
         public static Quaternion RandRot(float x, float y, float z)
         {
             return Quaternion.Euler(
@@ -146,18 +155,18 @@ namespace GunsOPlenty.Utils
         {
             if (from.transform.childCount > 0)
             {
-            }
-            for (int i = 0; i < from.transform.childCount; i++)
-            {
-                GameObject child = from.transform.GetChild(i).gameObject;
-                if (child.name == name)
+                for (int i = 0; i < from.transform.childCount; i++)
                 {
-                    return child;
-                }
-                GameObject grandChild = DescendantByName(child, name);
-                if (grandChild != null)
-                {
-                    return grandChild;
+                    GameObject child = from.transform.GetChild(i).gameObject;
+                    if (child.name == name)
+                    {
+                        return child;
+                    }
+                    GameObject grandChild = DescendantByName(child, name);
+                    if (grandChild != null)
+                    {
+                        return grandChild;
+                    }
                 }
             }
             return null;
@@ -169,8 +178,8 @@ namespace GunsOPlenty.Utils
             int count = 0;
             while (count < from.transform.childCount)
             {
-                descendants.Add(from.transform.GetChild(count).gameObject);
                 GatherDescendants(from.transform.GetChild(count).gameObject);
+                descendants.Add(from.transform.GetChild(count).gameObject);
                 count++;
             }
         }

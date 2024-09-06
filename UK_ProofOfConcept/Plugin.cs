@@ -7,9 +7,16 @@ using GunsOPlenty.Data;
 using PluginConfig.API;
 using UnityEngine.SceneManagement;
 using PluginConfig.API.Fields;
+using GunsOPlenty.Trials;
+using System.Linq.Expressions;
+using Debug = UnityEngine.Debug;
+using System;
+using Object = UnityEngine.Object;
+using System.IO;
+using UnityEngine.UI;
 
-// To anyone looking at this code, hopefully it works now
-// Inspired by CrashLibs but all the code is my own
+// To anyone looking at this code, #42630668, #c2b14422
+// funny colors
 // Feedback is greatly appreciated
 
 namespace GunsOPlenty
@@ -20,54 +27,79 @@ namespace GunsOPlenty
     {
         Harmony harmony = new Harmony(PluginInfo.GUID);
         bool firstTime = true;
+        string scene = "";
         public void Awake()
         {
-            //StartCoroutine(Setup());
+            
         }
 
         public void Start()
         {
-            ConfigManager.Setup();
-            AssetHandler.LoadBundle();
-            if (AssetHandler.bundleLoaded)
+            scene = SceneHelper.CurrentScene;
+            Debug.Log("Current Scene: " + scene);
+            //SaveManager.CreateContainer(Path.Combine(GOPUtils.ModSaveDir(), "test.goop"), "grgr");
+            //SaveManager.SerializeValue(Path.Combine(GOPUtils.ModDataDir(), "test.goop"), "thingy1", "val_val", "audio jungle");
+            //SaveManager.SerializeValue(Path.Combine(GOPUtils.ModDataDir(), "test.goop"), "thingy1", "val_val", "audio jungle");
+            /*int thing;
+            if (SaveManager.TryDeserializeValue(Path.Combine(GOPUtils.ModDataDir(), "test.goop"), "thingy1", "val_val", out thing))
             {
-                AssetHandler.CreateCustomPrefabs();
-                WeaponHandler.SetupWeapons();
-                harmony.PatchAll(typeof(WeaponPatch));
-                harmony.PatchAll(typeof(StylePatch));
+                Debug.Log("LOOK AT MY SON!!: " + thing);
             }
+            else
+            {
+                Debug.Log("I have disowned my son lol");
+            }*/
 
-            if (ConfigManager.StartupCheck.value)
-            {
-                SceneManager.activeSceneChanged += Startup;
-            }
+            SceneManager.activeSceneChanged += Startup;
+            SceneManager.activeSceneChanged += OnMainMenu;
+            //UnlockManager.Setup();
         }
 
         public void Update()
         {
-            //ConfigManager.Update();
+            if (SceneHelper.CurrentScene != scene)
+            {
+                scene = SceneHelper.CurrentScene;
+                Debug.Log("Current Scene: "+scene);
+            }
+
         }
         void Startup(Scene before, Scene after)
         {
-            if (SceneHelper.CurrentScene == "Main Menu" && firstTime)
+            if (SceneHelper.CurrentScene != "Bootstrap" && firstTime)//
             {
-                if (ConfigManager.StartupCheck.value)
+                ConfigManager.Setup();
+                AssetHandler.LoadBundle();
+                harmony.PatchAll(typeof(UnlockManager));
+                if (AssetHandler.bundleLoaded)
                 {
-                    if (AssetHandler.bundleLoaded)
-                    {
-                        MonoSingleton<HMRPlus>.Instance.SendHudMessageEffect(
-                        "Guns O' Plenty <grad=rainbow>Successfully</grad> Loaded!"
-                        , 0, 4f, false, 1 / 2f);
-                    }
-                    else
-                    {
-                        MonoSingleton<HMRPlus>.Instance.SendHudMessageEffect(
-                        "Guns O' Plenty <grad=crimson>Failed</grad> to Load!"
-                        , 0, 4f, false, 1 / 2f);
-                    }
+                    AssetHandler.CreateCustomPrefabs();
+                    PersistentCanvas.SetupCanvas();
+                    WeaponHandler.SetupWeapons();
+                    harmony.PatchAll(typeof(WeaponPatch));
+                    harmony.PatchAll(typeof(StylePatch));
+                    CommandManager.RegisterAll();
+                    TrialManager.SetupTrials();
+                    UnlockManager.Setup();
                 }
                 firstTime = false;
             }
+        }
+
+        void OnMainMenu(Scene before, Scene after)
+        {
+            if (SceneHelper.CurrentScene == "Main Menu")//
+            {
+                TrialManager.SetupUI();
+            }
+        }
+
+        public static bool IsInLevel()
+        {
+            return 
+                SceneHelper.CurrentScene != "Main Menu" &&
+                SceneHelper.CurrentScene != "Bootstrap" &&
+                SceneHelper.CurrentScene != "Intro";
         }
     }
 }

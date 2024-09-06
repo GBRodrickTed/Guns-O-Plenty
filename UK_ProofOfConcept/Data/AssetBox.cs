@@ -1,4 +1,5 @@
-﻿using Discord;
+﻿ using Discord;
+using GunsOPlenty.Trials.UI;
 using GunsOPlenty.Utils;
 using GunsOPlenty.Weapons;
 using System.Collections.Generic;
@@ -9,6 +10,7 @@ using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.AddressableAssets.ResourceLocators;
 using UnityEngine.ResourceManagement.AsyncOperations;
+using UnityEngine.XR;
 
 namespace GunsOPlenty.Data
 {
@@ -99,7 +101,28 @@ namespace GunsOPlenty.Data
             EffectBox.epicFire = LoadAsset<GameObject>("EpicThrower");
             EffectBox.bubble = LoadAsset<GameObject>("BubbleThrower");
             EffectBox.epicBubble = LoadAsset<GameObject>("EpicBubbleThrower");
+
+            GameObject tempPrefab;
+            tempPrefab = LoadAsset<GameObject>("Unlock Message");
+            tempPrefab.AddComponent<AchievementPopup>();
+            customPrefabs.Add(tempPrefab.name, tempPrefab);
+
+            tempPrefab = LoadAsset<GameObject>("Wisp Orb");
+            MeshRenderer tempMeshR;
+            if (tempPrefab.TryGetComponent<MeshRenderer>(out tempMeshR))
+            {
+                tempMeshR.material.shader = ShaderBox.unlit_alphatest_nocull;
+            }
+            tempPrefab.AddComponent<WispOrb>();
+            tempPrefab.AddComponent<WaterCheck>();
+            customPrefabs.Add(tempPrefab.name, tempPrefab);
+
+            tempPrefab = LoadAsset<GameObject>("Wisp Baby");
+            tempPrefab.AddComponent<WispBuddy>();
+            tempPrefab.AddComponent<WaterCheck>();
+            customPrefabs.Add(tempPrefab.name, tempPrefab);
         }
+        public static Dictionary<string, GameObject> customPrefabs = new Dictionary<string, GameObject>(); // TODO: Fully switch to this;
         public static GameObject coinShot;
         public static GameObject generator;
         public static GameObject beething;
@@ -126,11 +149,15 @@ namespace GunsOPlenty.Data
     public static class ShaderBox
     {
         public static Shader vertexlit = Addressables.LoadAssetAsync<Shader>("Assets/Shaders/Main/ULTRAKILL-vertexlit.shader").WaitForCompletion();
-        public static Shader psx_abient = Addressables.LoadAssetAsync<Shader>("Assets/Shaders/Main/ULTRAKILL-unlit-ambient.shader").WaitForCompletion();
+        public static Shader unlit_ambient = Addressables.LoadAssetAsync<Shader>("Assets/Shaders/Main/ULTRAKILL-unlit-ambient.shader").WaitForCompletion();
         public static Shader vertexlit_emissive = Addressables.LoadAssetAsync<Shader>("Assets/Shaders/Main/ULTRAKILL-vertexlit-emissive.shader").WaitForCompletion();
+        public static Shader unlit_alphatest_cull = Addressables.LoadAssetAsync<Shader>("Assets/Shaders/AlphaTest/ULTRAKILL-unlit-alphatest-cull.shader").WaitForCompletion();
+        public static Shader unlit_alphatest_nocull = Addressables.LoadAssetAsync<Shader>("Assets/Shaders/AlphaTest/ULTRAKILL-unlit-alphatest-nocull.shader").WaitForCompletion();
+        public static Shader vertexlit_alphatest_nocull = Addressables.LoadAssetAsync<Shader>("Assets/Shaders/AlphaTest/ULTRAKILL-vertexlit-alphatest-nocull.shader").WaitForCompletion();
+        
     }
 
-    public static class EffectBox
+    public static class EffectBox // no longer needed :D (for now)
     {
         public static GameObject fire;
         public static GameObject epicFire;

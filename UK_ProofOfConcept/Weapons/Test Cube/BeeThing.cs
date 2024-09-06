@@ -11,7 +11,6 @@ using UnityEngine;
 
 public class BeeThing : MonoBehaviour
 {
-    //public static UKAsset<GameObject> UK_Boom { get; private set; } = new UKAsset<GameObject>("Assets/Prefabs/Attacks and Projectiles/Coin.prefab");
     private Vector3 startPos;
     private Vector3 crazyPos;
     public float factor = 0.5f;

@@ -17,9 +17,14 @@ namespace GunsOPlenty.Stuff
         public virtual GameObject LoadedAsset { get; protected set; }
         public virtual int Slot { get; set; }
         public virtual string Name { get; protected set; }
+        public virtual string ID { get; protected set; }
         public virtual bool IsSetup { get; protected set; }
         public virtual bool ShouldHave { get; set; }
-        public abstract void Setup();
+        public virtual void Setup()
+        {
+            Name = "Generic Gop Weapon";
+            ID = "generic_gop_weapon";
+        }
         public void UnSetup()
         {
             Debug.Log("UnSetting Up " + Name);
@@ -34,6 +39,11 @@ namespace GunsOPlenty.Stuff
         public void Create(Transform transform)
         {
             LoadedAsset = UnityEngine.Object.Instantiate(Asset, transform);
+        }
+
+        public virtual void UpdateConfigSettings()
+        {
+
         }
     }
 }

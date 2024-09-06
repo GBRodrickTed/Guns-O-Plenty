@@ -12,7 +12,8 @@ using UnityEngine;
 using UnityEngine.Assertions;
 
 namespace GunsOPlenty.Weapons
-{ 
+{
+    //Probably some of the shittiest shit i've ever shat
     public class TestCubeSoul : MonoBehaviour
     {
         private void Start()
@@ -41,7 +42,7 @@ namespace GunsOPlenty.Weapons
             fireAreaCol = fireArea.GetComponent<CapsuleCollider>();
             fireAreaCol.enabled = false;
             ChangeFireAreaSize(15f);
-            isFireEpic = ConfigManager.TestCubeEpicFire.value;
+            //isFireEpic = ConfigManager.TestCubeEpicFire.value;
             if (this.wid.delay > 0)
             {
                 GameObject oldFlameThrower;
@@ -56,6 +57,7 @@ namespace GunsOPlenty.Weapons
             }
             //note to self: use wav files for seemless looping
             gunTipAud = shootPoint.GetComponent<AudioSource>();
+            //Why must the best fire texture i can find have to be a still minecraft fire png if i could find streetcleaner flame i'd use that but i can't so here we are
             if (isFireEpic)
             {
                 firePartObj = Instantiate(EffectBox.epicFire, shootPoint.transform);
@@ -79,7 +81,6 @@ namespace GunsOPlenty.Weapons
                 //Debug.Log("UnDoing it");
                 thingy.deathTime = 30f;
             }
-
         }
         public void OnDisable()
         {
@@ -228,12 +229,10 @@ namespace GunsOPlenty.Weapons
     {
         public override GameObject Asset { get; protected set; }
         public override int Slot { get; set; }
-        public override string Name { get; protected set; }
-        public override bool IsSetup { get; protected set; }
-        public override bool ShouldHave { get; set; }
         public override void Setup()
         {
             Debug.Log("Setting up Test Cube");
+            ID = "test_cube";
             if (Asset == null)
             {
                 Asset = AssetHandler.LoadAsset<GameObject>("TestCube Prefab");
@@ -242,7 +241,7 @@ namespace GunsOPlenty.Weapons
             if (Asset != null && !IsSetup)
             {
                 Name = "Test Cube";
-                Slot = ConfigManager.TestCubeSlot.value;
+                //Slot = ConfigManager.TestCubeSlot.value;
                 Asset.AddComponent<TestCubeSoul>();
                 foreach (GameObject thing in GOPUtils.DescendantsList(Asset))
                 {
@@ -259,6 +258,13 @@ namespace GunsOPlenty.Weapons
                 Slot = -1;
             }
         }
+
+        /*public override void UpdateConfigSettings()
+        {
+            ShouldHave = ConfigManager.TestCubeEnable.value;
+            Slot = ConfigManager.TestCubeSlot.value;
+            WeaponHandler.isCheating |= ConfigManager.TestCubeEnable.value;
+        }*/
         /*public override void Create(Transform transform)
         {
             LoadedAsset = UnityEngine.Object.Instantiate(Asset, transform);

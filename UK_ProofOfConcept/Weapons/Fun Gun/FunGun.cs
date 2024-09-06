@@ -196,6 +196,7 @@ namespace GunsOPlenty.Weapons
         public override void Setup()
         {
             Debug.Log("Setting up Fun Gun");
+            ID = "funny_gun";
             if (Asset == null)
             {
                 Asset = AssetHandler.LoadAsset<GameObject>("Fun Gun Prefab");
@@ -226,6 +227,12 @@ namespace GunsOPlenty.Weapons
                 Name = "Fun Gun is NULL";
                 Slot = -1;
             }
+        }
+        public override void UpdateConfigSettings()
+        {
+            ShouldHave = ConfigManager.FunGunEnable.value;
+            Slot = ConfigManager.FunGunSlot.value;
+            WeaponHandler.isCheating |= ConfigManager.FunGunEnable.value; //TODO: Probably not this?
         }
         /*public override void Create(Transform transform)
         {

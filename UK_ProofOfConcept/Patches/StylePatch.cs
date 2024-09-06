@@ -1,6 +1,8 @@
-﻿using GunsOPlenty.Utils;
+﻿using GunsOPlenty.Trials;
+using GunsOPlenty.Utils;
 using HarmonyLib;
 using UnityEngine;
+using static UnityEngine.ParticleSystem.PlaybackState;
 
 namespace GunsOPlenty.Stuff
 {
@@ -11,7 +13,7 @@ namespace GunsOPlenty.Stuff
         [HarmonyPrefix]
         public static bool no(LeaderboardController __instance)
         {
-            if (WeaponHandler.isCheating)
+            if (WeaponHandler.isCheating || TrialManager.InTrial())
             {
                 Debug.Log("no");
                 return false;
@@ -23,7 +25,7 @@ namespace GunsOPlenty.Stuff
         [HarmonyPrefix]
         public static bool nope(LeaderboardController __instance)
         {
-            if (WeaponHandler.isCheating)
+            if (WeaponHandler.isCheating || TrialManager.InTrial())
             {
                 Debug.Log("nope");
                 return false;
@@ -35,7 +37,7 @@ namespace GunsOPlenty.Stuff
         [HarmonyPrefix]
         public static bool notevenfish(LeaderboardController __instance)
         {
-            if (WeaponHandler.isCheating)
+            if (WeaponHandler.isCheating || TrialManager.InTrial())
             {
                 Debug.Log("not even fish");
                 return false;
@@ -69,7 +71,7 @@ namespace GunsOPlenty.Stuff
                 __instance.enemiesShot = true;
                 if (dead)
                 {
-                    if (enemyType == "spider") // wtf is a "spider"
+                    if (enemyType == "spider") // I now know what "spider" is
                     {
                         __instance.AddPoints(100, "ultrakill.bigkill", eid, sourceWeapon);
                     }

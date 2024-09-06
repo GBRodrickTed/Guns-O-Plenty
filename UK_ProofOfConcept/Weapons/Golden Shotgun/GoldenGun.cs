@@ -9,6 +9,7 @@ using UnityEngine;
 
 namespace GunsOPlenty.Weapons
 {
+    //TODO: Idle animation doesn't play after cha-chinging or empty shot
     public class GoldenGunSoul : MonoBehaviour
     {
         private void Start()
@@ -234,12 +235,10 @@ namespace GunsOPlenty.Weapons
     {
         public override GameObject Asset { get; protected set; }
         public override int Slot { get; set; }
-        public override string Name { get; protected set; }
-        public override bool IsSetup { get; protected set; }
-        public override bool ShouldHave { get; set; }
         public override void Setup()
         {
             Debug.Log("Setting up Golden Gun");
+            ID = "golden_shotgun";
             if (Asset == null)
             {
                 Asset = AssetHandler.LoadAsset<GameObject>("Golden Gun Prefab");
@@ -265,6 +264,13 @@ namespace GunsOPlenty.Weapons
                 Name = "Golden Shotgun is NULL";
                 Slot = -1;
             }
+        }
+
+        public override void UpdateConfigSettings()
+        {
+            ShouldHave = ConfigManager.GoldenGunEnable.value;
+            Slot = ConfigManager.GoldenGunSlot.value;
+            WeaponHandler.isCheating |= ConfigManager.GoldenGunEnable.value;
         }
         /*public override void Create(Transform transform)
         {
